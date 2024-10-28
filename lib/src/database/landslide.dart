@@ -40,17 +40,42 @@ class LandslideDatabase {
     }
   }
 
-  Future<List<LandslidePoint>> fetchLandslidePoints() async {
-    final response = await http.get(Uri.parse('$_baseUrl/landslides'));
+// lib/src/database/landslide.dart
 
+Future<List<LandslidePoint>> fetchLandslidePoints() async {
+  try {
+    final response = await http.get(Uri.parse('$_baseUrl/landslides'));
+    
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse.map((data) => LandslidePoint.fromJson(data)).toList();
-    } else {
-      throw Exception('Không thể tải danh sách điểm trượt lở');
-    }
-  }
+      print('Received ${jsonResponse.length} landslide points from API');
+      
+      // Debug first item
+      if (jsonResponse.isNotEmpty) {
+        print('Sample landslide point data: ${jsonResponse.first}');
+      }
 
+      List<LandslidePoint> points = [];
+      for (var data in jsonResponse) {
+        try {
+          final point = LandslidePoint.fromJson(data);
+          points.add(point);
+        } catch (e) {
+          print('Error parsing single landslide point: $e');
+          print('Problematic data: $data');
+        }
+      }
+
+      print('Successfully parsed ${points.length} landslide points');
+      return points;
+    } else {
+      throw Exception('Could not load landslide points. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error in fetchLandslidePoints: $e');
+    return []; // Return empty list instead of throwing
+  }
+}
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }

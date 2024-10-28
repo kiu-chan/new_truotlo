@@ -38,7 +38,6 @@ dependencies:
   http: ^1.2.2
   intl: ^0.19.0
   fl_chart: ^0.68.0
-  mapbox_gl: ^0.16.0
   postgres: ^2.5.0
   geolocator: ^9.0.0
   url_launcher: ^6.3.0
@@ -48,6 +47,10 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   mailer: ^6.2.0
   carousel_slider: ^5.0.0
+  flutter_map: ^6.0.1
+  latlong2: ^0.9.1
+  cached_network_image: ^3.4.1
+  photo_view: ^0.15.0
 
 dev_dependencies:
   flutter_test:

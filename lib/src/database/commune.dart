@@ -1,17 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:new_truotlo/src/config/api.dart';
+import 'package:new_truotlo/src/data/map/commune.dart';
 
-class Commune {
-  final int id;
-  final String name;
-  final String districtName;
-  final String provinceName;
-  final List<List<LatLng>> polygons;
-
-  Commune(this.id, this.name, this.districtName, this.provinceName, this.polygons);
-}
 
 class CommuneDatabase {
   final String baseUrl = ApiConfig().getApiUrl();

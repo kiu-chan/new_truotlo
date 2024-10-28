@@ -34,7 +34,7 @@ class SelectPageState extends State<SelectPage> {
   Widget build(BuildContext context) {
     List<Widget> pages = [
       const HomePage(),
-      const MapboxPage(),
+      const MapPage(),
       if (_isLoggedIn) const ManagePage(),
       const ChartPage(),
       const SettingsPage(),

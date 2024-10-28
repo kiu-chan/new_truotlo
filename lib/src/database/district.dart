@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:new_truotlo/src/config/api.dart';
 import 'package:new_truotlo/src/data/map/district_data.dart';
 

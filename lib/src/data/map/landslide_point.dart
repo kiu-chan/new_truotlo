@@ -1,27 +1,77 @@
-import 'package:mapbox_gl/mapbox_gl.dart';
+// lib/src/data/map/landslide_point.dart
+
+import 'package:latlong2/latlong.dart';
 
 class LandslidePoint {
   final int id;
-  final LatLng location;
-  final String district;
+  final double lon;
+  final double lat;
+  final int? communeId;
+  final String? viTri;
+  final String? moTa;
+  final String districtName;
+  final String communeName;
+  final List<String> images;
 
-  LandslidePoint(this.id, this.location, this.district);
+  const LandslidePoint({
+    required this.id,
+    required this.lon,
+    required this.lat,
+    this.communeId,
+    this.viTri,
+    this.moTa,
+    required this.districtName,
+    required this.communeName,
+    required this.images,
+  });
 
   factory LandslidePoint.fromJson(Map<String, dynamic> json) {
-    return LandslidePoint(
-      json['id'] is int ? json['id'] : int.parse(json['id']),
-      LatLng(
-        _parseDouble(json['lat']),
-        _parseDouble(json['lon'])
-      ),
-      json['district'] as String,
+    List<String> processImages(List<dynamic>? imageList) {
+      print('Raw images data: $imageList');
+      if (imageList == null || imageList.isEmpty) {
+        print('No images for point ID: ${json['id']}');
+        return [];
+      }
+
+      const baseUrl = 'http://truotlobinhdinh.girc.edu.vn/storage';
+      var urls = imageList.map((path) {
+        var fullUrl = '$baseUrl/$path';
+        print('Created image URL: $fullUrl');
+        return fullUrl;
+      }).toList();
+
+      print('Processed image URLs for point ${json['id']}: $urls');
+      return urls;
+    }
+
+    print('Processing JSON data: ${json.toString()}');
+    var point = LandslidePoint(
+      id: json['id'],
+      lon: double.parse(json['lon'].toString()),
+      lat: double.parse(json['lat'].toString()),
+      communeId: json['commune_id'],
+      viTri: json['vi_tri'],
+      moTa: json['mo_ta'],
+      districtName: json['district_name'] ?? '',
+      communeName: json['commune_name'] ?? '',
+      images: processImages(json['images'] as List?),
     );
+
+    print('Created LandslidePoint with images: ${point.images}');
+    return point;
   }
 
-  static double _parseDouble(dynamic value) {
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.parse(value);
-    throw FormatException('Invalid numeric value: $value');
+  LatLng get location => LatLng(lat, lon);
+
+  @override
+  String toString() {
+    return '''
+LandslidePoint:
+  ID: $id
+  Location: ($lat, $lon)
+  District: $districtName
+  Commune: $communeName
+  Images: $images
+''';
   }
 }
