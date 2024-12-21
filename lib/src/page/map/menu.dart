@@ -21,9 +21,9 @@ class MapMenu extends StatelessWidget {
   final Function(String, bool?) onDistrictLandslideVisibilityChanged;
   final bool showOnlyLandslideRisk;
   final Function(bool?) onShowOnlyLandslideRiskChanged;
-  final bool showOnlyFlashFloodRisk;  // Thêm mới
+  final bool showOnlyFlashFloodRisk;
   final bool showOnlyLargeSlideRisk;
-  final Function(bool?) onShowOnlyFlashFloodRiskChanged;  // Thêm mới
+  final Function(bool?) onShowOnlyFlashFloodRiskChanged;
   final Function(bool?) onShowOnlyLargeSlideRiskChanged;
 
   const MapMenu({
@@ -44,114 +44,302 @@ class MapMenu extends StatelessWidget {
     required this.onLandslidePointsVisibilityChanged,
     required this.districtLandslideVisibility,
     required this.onDistrictLandslideVisibilityChanged,
-    required this.showOnlyLandslideRisk,  // Thêm vào đây
+    required this.showOnlyLandslideRisk,
     required this.onShowOnlyLandslideRiskChanged,
-    required this.showOnlyFlashFloodRisk,  // Thêm mới
+    required this.showOnlyFlashFloodRisk,
     required this.showOnlyLargeSlideRisk,
-    required this.onShowOnlyFlashFloodRiskChanged,  // Thêm mới
-    required this.onShowOnlyLargeSlideRiskChanged, 
+    required this.onShowOnlyFlashFloodRiskChanged,
+    required this.onShowOnlyLargeSlideRiskChanged,
   });
+
+  Widget _buildHeader() {
+    return DrawerHeader(
+      decoration: const BoxDecoration(
+        color: Colors.blue,
+        image: DecorationImage(
+          image: AssetImage('lib/assets/map/header_bg.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.blue,
+            BlendMode.softLight,
+          ),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Tùy chọn bản đồ',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  offset: Offset(1.0, 1.0),
+                  blurRadius: 3.0,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Tùy chỉnh hiển thị các lớp bản đồ',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              shadows: [
+                Shadow(
+                  offset: Offset(1.0, 1.0),
+                  blurRadius: 3.0,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMapStyleSection() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ExpansionTile(
+        leading: const Icon(Icons.map, color: Colors.blue),
+        title: const Text(
+          'Kiểu bản đồ',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: styleCategories.map((category) => 
+          Theme(
+            data: ThemeData(
+              dividerColor: Colors.transparent,
+            ),
+            child: ExpansionTile(
+              title: Text(
+                category.name,
+                style: const TextStyle(fontSize: 14),
+              ),
+              children: category.styles.map((style) => 
+                RadioListTile<String>(
+                  title: Text(
+                    style.name,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  value: style.url,
+                  groupValue: currentStyle,
+                  onChanged: onStyleChanged,
+                  dense: true,
+                  activeColor: Colors.blue,
+                ),
+              ).toList(),
+            ),
+          ),
+        ).toList(),
+      ),
+    );
+  }
+
+  Widget _buildLayersSection() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ExpansionTile(
+        leading: const Icon(Icons.layers, color: Colors.green),
+        title: const Text(
+          'Lớp hiển thị',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: [
+          _buildCheckboxTile(
+            'Huyện',
+            isDistrictsVisible,
+            onDistrictsVisibilityChanged,
+            Icons.location_city,
+          ),
+          _buildCheckboxTile(
+            'Ranh giới',
+            isBorderVisible,
+            onBorderVisibilityChanged,
+            Icons.border_all,
+          ),
+          _buildCheckboxTile(
+            'Xã',
+            isCommunesVisible,
+            onCommunesVisibilityChanged,
+            Icons.location_on,
+          ),
+          _buildCheckboxTile(
+            'Điểm trượt lở',
+            isLandslidePointsVisible,
+            onLandslidePointsVisibilityChanged,
+            Icons.warning,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRiskFiltersSection() {
+    if (!isLandslidePointsVisible) return const SizedBox.shrink();
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ExpansionTile(
+        leading: const Icon(Icons.filter_alt, color: Colors.orange),
+        title: const Text(
+          'Bộ lọc cảnh báo',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: [
+          _buildRiskFilterTile(
+            'Nguy cơ trượt nông',
+            showOnlyLandslideRisk,
+            onShowOnlyLandslideRiskChanged,
+            Colors.red,
+          ),
+          _buildRiskFilterTile(
+            'Nguy cơ lũ quét',
+            showOnlyFlashFloodRisk,
+            onShowOnlyFlashFloodRiskChanged,
+            Colors.blue,
+          ),
+          _buildRiskFilterTile(
+            'Nguy cơ trượt lớn',
+            showOnlyLargeSlideRisk,
+            onShowOnlyLargeSlideRiskChanged,
+            Colors.purple,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDistrictsSection() {
+    if (!isDistrictsVisible) return const SizedBox.shrink();
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ExpansionTile(
+        leading: const Icon(Icons.map_outlined, color: Colors.brown),
+        title: const Text(
+          'Quản lý huyện',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: districts.map((district) =>
+          _buildDistrictTile(district),
+        ).toList(),
+      ),
+    );
+  }
+
+  Widget _buildLandslideLocationsSection() {
+    if (!isLandslidePointsVisible) return const SizedBox.shrink();
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ExpansionTile(
+        leading: const Icon(Icons.place, color: Colors.red),
+        title: const Text(
+          'Vị trí trượt lở theo huyện',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: districtLandslideVisibility.entries.map((entry) =>
+          _buildLandslideLocationTile(entry.key, entry.value),
+        ).toList(),
+      ),
+    );
+  }
+
+  Widget _buildCheckboxTile(
+    String title,
+    bool value,
+    Function(bool?) onChanged,
+    IconData icon,
+  ) {
+    return ListTile(
+      leading: Icon(icon, size: 20, color: Colors.grey[600]),
+      title: Text(title, style: const TextStyle(fontSize: 14)),
+      trailing: Switch(
+        value: value,
+        onChanged: onChanged,
+        activeColor: Colors.blue,
+      ),
+      dense: true,
+    );
+  }
+
+  Widget _buildRiskFilterTile(
+    String title,
+    bool value,
+    Function(bool?) onChanged,
+    Color color,
+  ) {
+    return ListTile(
+      leading: Icon(Icons.warning, size: 20, color: color),
+      title: Text(title, style: const TextStyle(fontSize: 14)),
+      trailing: Switch(
+        value: value,
+        onChanged: onChanged,
+        activeColor: color,
+      ),
+      dense: true,
+    );
+  }
+
+  Widget _buildDistrictTile(District district) {
+    return ListTile(
+      leading: const Icon(Icons.location_city, size: 20),
+      title: Text(
+        district.name,
+        style: const TextStyle(fontSize: 14),
+      ),
+      trailing: Switch(
+        value: districtVisibility[district.id] ?? true,
+        onChanged: (value) => onDistrictVisibilityChanged(district.id, value),
+        activeColor: Colors.blue,
+      ),
+      dense: true,
+    );
+  }
+
+  Widget _buildLandslideLocationTile(String district, bool value) {
+    return ListTile(
+      leading: const Icon(Icons.place, size: 20),
+      title: Text(
+        district,
+        style: const TextStyle(fontSize: 14),
+      ),
+      trailing: Switch(
+        value: value,
+        onChanged: (bool? newValue) =>
+            onDistrictLandslideVisibilityChanged(district, newValue),
+        activeColor: Colors.red,
+      ),
+      dense: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Text('Tùy chọn bản đồ',
-                style: TextStyle(color: Colors.white, fontSize: 24)),
-          ),
-          ExpansionTile(
-            leading: const Icon(Icons.map),
-            title: const Text('Bản đồ'),
-            children: <Widget>[
-              ...styleCategories.map((category) => ExpansionTile(
-                    title: Text(category.name),
-                    children: category.styles
-                        .map((style) => RadioListTile<String>(
-                              title: Text(style.name),
-                              value: style.url,
-                              groupValue: currentStyle,
-                              onChanged: onStyleChanged,
-                            ))
-                        .toList(),
-                  )),
-            ],
-          ),
-          ExpansionTile(
-            leading: const Icon(Icons.location_on),
-            title: const Text('Khu vực'),
-            children: <Widget>[
-              CheckboxListTile(
-                title: const Text('Huyện'),
-                value: isDistrictsVisible,
-                onChanged: onDistrictsVisibilityChanged,
-              ),
-              CheckboxListTile(
-                title: const Text('Ranh giới'),
-                value: isBorderVisible,
-                onChanged: onBorderVisibilityChanged,
-              ),
-              CheckboxListTile(
-                title: const Text('Xã'),
-                value: isCommunesVisible,
-                onChanged: onCommunesVisibilityChanged,
-              ),
-              CheckboxListTile(
-                title: const Text('Điểm trượt lở'),
-                value: isLandslidePointsVisible,
-                onChanged: onLandslidePointsVisibilityChanged,
-              ),
-            ],
-          ),
-          if (isDistrictsVisible)
-            ExpansionTile(
-              leading: const Icon(Icons.map_outlined),
-              title: const Text('Huyện'),
-              children: districts
-                  .map((district) => CheckboxListTile(
-                        title: Text(district.name),
-                        value: districtVisibility[district.id],
-                        onChanged: (bool? value) =>
-                            onDistrictVisibilityChanged(district.id, value),
-                      ))
-                  .toList(),
-            ),
-          if (isLandslidePointsVisible)
-            ExpansionTile(
-              leading: const Icon(Icons.filter_alt),
-              title: const Text('Vị trí trượt lở theo huyện'),
-              children: districtLandslideVisibility.entries.map((entry) {
-                return CheckboxListTile(
-                  title: Text(entry.key),
-                  value: entry.value,
-                  onChanged: (bool? value) =>
-                      onDistrictLandslideVisibilityChanged(entry.key, value),
-                );
-              }).toList(),
-            ),
-            if (isLandslidePointsVisible)
-              CheckboxListTile(
-                title: const Text('Chỉ hiện điểm trượt nông'),
-                subtitle: const Text('Ẩn các điểm không có nguy cơ'),
-                value: showOnlyLandslideRisk,
-                onChanged: onShowOnlyLandslideRiskChanged,
-              ),
-              CheckboxListTile(
-                title: const Text('Chỉ hiện điểm lũ quét'),
-                subtitle: const Text('Ẩn các điểm không có nguy cơ'),
-                value: showOnlyFlashFloodRisk,
-                onChanged: onShowOnlyFlashFloodRiskChanged,
-              ),
-              CheckboxListTile(
-                title: const Text('Chỉ hiện điểm trượt lớn'),
-                subtitle: const Text('Ẩn các điểm không có nguy cơ'),
-                value: showOnlyLargeSlideRisk,
-                onChanged: onShowOnlyLargeSlideRiskChanged,
-              ),
-        ],
+      child: Container(
+        color: Colors.grey[50],
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 8),
+            _buildMapStyleSection(),
+            _buildLayersSection(),
+            _buildRiskFiltersSection(),
+            _buildDistrictsSection(),
+            _buildLandslideLocationsSection(),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }
