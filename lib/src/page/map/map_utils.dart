@@ -60,27 +60,26 @@ class MapUtils {
     return polygons;
   }
 
-  static List<Marker> buildMarkers({
-    required List<LandslidePoint> points,
-    required bool showLandslidePoints,
-    required Function(LandslidePoint) onTap,
-  }) {
-    if (!showLandslidePoints) return [];
-    
-    return points.map((point) {
-      return Marker(
-        point: LatLng(point.lat, point.lon),
-        width: 30,
-        height: 30,
-        child: GestureDetector(
-          onTap: () => onTap(point),
-          child: const Icon(
-            Icons.warning,
-            color: Colors.red,
-            size: 30,
-          ),
+static List<Marker> buildMarkers({
+  required List<LandslidePoint> points,
+  required bool showLandslidePoints,
+  required Function(LandslidePoint) onTap,
+}) {
+  if (!showLandslidePoints) return [];
+  
+  return points.map((point) {
+    return Marker(
+      point: LatLng(point.lat, point.lon),
+      width: 32,  // Adjust size as needed
+      height: 32, // Adjust size as needed
+      child: GestureDetector(
+        onTap: () => onTap(point),
+        child: Image.asset(
+          'lib/assets/map/landslide_0.png',
+          fit: BoxFit.contain,
         ),
-      );
-    }).toList();
-  }
+      ),
+    );
+  }).toList();
+}
 }

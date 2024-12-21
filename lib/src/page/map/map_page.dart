@@ -1,16 +1,13 @@
-// lib/src/page/map/map_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:new_truotlo/src/page/map/widgets/landslide_info_dialog.dart';
+import 'package:new_truotlo/src/page/map/widgets/layer_panel.dart';
+import 'package:new_truotlo/src/page/map/widgets/map_controls.dart';
 import 'package:new_truotlo/src/data/map/district_data.dart';
-import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/data/map/commune.dart';
+import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/database.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -26,13 +23,17 @@ class _MapPageState extends State<MapPage> {
   List<District> _districts = [];
   List<Commune> _communes = [];
   List<LandslidePoint> _landslidePoints = [];
+  List<List<LatLng>> _borderPolygons = [];
   bool _isLoading = true;
 
+  // Các trạng thái hiển thị các lớp trên bản đồ
   bool _showDistricts = true;
   bool _showCommunes = false;
   bool _showLandslidePoints = true;
   bool _showLayerPanel = false;
+  bool _showBorder = true;
 
+  // Vị trí trung tâm của Bình Định
   static const LatLng _binhDinhCenter = LatLng(14.1766, 109.1746);
   static const double _initialZoom = 9.0;
 
@@ -42,29 +43,28 @@ class _MapPageState extends State<MapPage> {
     _loadData();
   }
 
+  // Hàm tải dữ liệu từ server
   Future<void> _loadData() async {
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
       await _database.connect();
       
-      final districts = await _database.fetchDistrictsData();
-      final communes = await _database.fetchCommunesData();
-      final landslidePoints = await _database.fetchLandslidePoints();
+      // Tải dữ liệu song song để tối ưu thời gian
+      final futures = await Future.wait([
+        _database.fetchDistrictsData(),
+        _database.fetchCommunesData(),
+        _database.fetchLandslidePoints(),
+        _database.fetchAndParseGeometry(),
+      ]);
       
-      print('Loaded ${districts.length} districts');
-      print('Loaded ${communes.length} communes');
-      print('Loaded ${landslidePoints.length} landslide points');
-      
-      if (landslidePoints.isNotEmpty) {
-        print('Sample point: ${landslidePoints.first}');
-        if (landslidePoints.first.images.isNotEmpty) {
-          print('Sample image URL: ${landslidePoints.first.images.first}');
-        }
-      }
-
       setState(() {
-        _districts = districts;
-        _communes = communes;
-        _landslidePoints = landslidePoints;
+        _districts = futures[0] as List<District>;
+        _communes = futures[1] as List<Commune>;
+        _landslidePoints = futures[2] as List<LandslidePoint>;
+        _borderPolygons = futures[3] as List<List<LatLng>>;
         _isLoading = false;
       });
     } catch (e) {
@@ -72,12 +72,37 @@ class _MapPageState extends State<MapPage> {
       setState(() {
         _isLoading = false;
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Có lỗi khi tải dữ liệu: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
+  // Xây dựng các polygon cho bản đồ
   List<Polygon> _buildPolygons() {
     List<Polygon> polygons = [];
     
+    // Thêm polygon ranh giới tỉnh
+    if (_showBorder) {
+      for (var polygon in _borderPolygons) {
+        polygons.add(
+          Polygon(
+            points: polygon,
+            color: Colors.red.withOpacity(0.1),
+            borderColor: Colors.red,
+            borderStrokeWidth: 2.0,
+            isFilled: true,
+          ),
+        );
+      }
+    }
+    
+    // Thêm polygon quận/huyện
     if (_showDistricts) {
       for (var district in _districts) {
         for (var polygon in district.polygons) {
@@ -94,6 +119,7 @@ class _MapPageState extends State<MapPage> {
       }
     }
     
+    // Thêm polygon xã/phường
     if (_showCommunes) {
       for (var commune in _communes) {
         for (var polygon in commune.polygons) {
@@ -113,260 +139,24 @@ class _MapPageState extends State<MapPage> {
     return polygons;
   }
 
+  // Xây dựng các marker cho điểm trượt lở
   List<Marker> _buildMarkers() {
     if (!_showLandslidePoints) return [];
     
     return _landslidePoints.map((point) {
       return Marker(
         point: point.location,
-        width: 30,
-        height: 30,
+        width: 32,
+        height: 32,
         child: GestureDetector(
-          onTap: () => _showLandslideInfo(point),
-          child: const Icon(
-            Icons.warning,
-            color: Colors.red,
-            size: 30,
+          onTap: () => showLandslideInfoDialog(context, point.id),
+          child: Image.asset(
+            'lib/assets/map/landslide_0.png',
+            fit: BoxFit.contain,
           ),
         ),
       );
     }).toList();
-  }
-
-void _showLandslideInfo(LandslidePoint point) {
-  print('Showing info for point ${point.id}');
-  print('Images: ${point.images}');
-
-  showDialog(
-    context: context,
-    builder: (context) => Dialog(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Thông tin điểm trượt lở',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildInfoRow('ID', '${point.id}'),
-                    if (point.districtName.isNotEmpty)
-                      _buildInfoRow('Quận/Huyện', point.districtName),
-                    if (point.communeName.isNotEmpty)
-                      _buildInfoRow('Xã/Phường', point.communeName),
-                    _buildInfoRow('Tọa độ', '${point.lat}, ${point.lon}'),
-                    if (point.viTri?.isNotEmpty == true)
-                      _buildInfoRow('Vị trí', point.viTri!),
-                    if (point.moTa?.isNotEmpty == true)
-                      _buildInfoRow('Mô tả', point.moTa!),
-                    if (point.images.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Hình ảnh:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text('${point.images.length} hình'),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 200,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: point.images.length,
-                          itemBuilder: (context, index) {
-                            final imageUrl = point.images[index];
-                            print('Loading image: $imageUrl');
-                            
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: GestureDetector(
-                                onTap: () => _showFullScreenImage(
-                                  context,
-                                  point.images,
-                                  index,
-                                ),
-                                child: Container(
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: Colors.grey[300]!,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: CachedNetworkImage(
-                                      imageUrl: imageUrl,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => Container(
-                                        color: Colors.grey[200],
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) {
-                                        print('Error loading image: $error for URL: $url');
-                                        return Container(
-                                          color: Colors.grey[200],
-                                          child: const Center(
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.error_outline,
-                                                  color: Colors.red,
-                                                  size: 32,
-                                                ),
-                                                SizedBox(height: 4),
-                                                Text(
-                                                  'Không thể tải hình',
-                                                  style: TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-Widget _buildInfoRow(String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 100,
-          child: Text(
-            '$label:',
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(value),
-        ),
-      ],
-    ),
-  );
-}
-
-  void _showFullScreenImage(BuildContext context, List<String> images, int initialIndex) {
-    print('Opening image gallery with ${images.length} images');
-    print('Initial image: ${images[initialIndex]}');
-    
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
-          body: Stack(
-            children: [
-              PhotoViewGallery.builder(
-                scrollPhysics: const BouncingScrollPhysics(),
-                builder: (BuildContext context, int index) {
-                  return PhotoViewGalleryPageOptions(
-                    imageProvider: CachedNetworkImageProvider(images[index]),
-                    initialScale: PhotoViewComputedScale.contained,
-                    minScale: PhotoViewComputedScale.contained,
-                    maxScale: PhotoViewComputedScale.covered * 2,
-                  );
-                },
-                itemCount: images.length,
-                loadingBuilder: (context, event) => const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                ),
-                backgroundDecoration: const BoxDecoration(color: Colors.black),
-                pageController: PageController(initialPage: initialIndex),
-              ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Hình ${initialIndex + 1}/${images.length}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -397,120 +187,56 @@ Widget _buildInfoRow(String label, String value) {
                 _showLayerPanel = !_showLayerPanel;
               });
             },
+            tooltip: 'Hiển thị/Ẩn bảng điều khiển lớp',
           ),
         ],
       ),
       body: Stack(
         children: [
+          // Widget bản đồ chính
           FlutterMap(
             mapController: _mapController,
-            options: const MapOptions(
+            options: MapOptions(
               initialCenter: _binhDinhCenter,
               initialZoom: _initialZoom,
               minZoom: 4.0,
               maxZoom: 18.0,
+              interactionOptions: const InteractionOptions(
+                enableScrollWheel: true,
+                enableMultiFingerGestureRace: true,
+              ),
             ),
             children: [
+              // Lớp nền OpenStreetMap
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.app',
+                subdomains: const ['a', 'b', 'c'],
               ),
+              // Lớp các polygon
               PolygonLayer(
                 polygons: _buildPolygons(),
               ),
+              // Lớp các marker điểm trượt lở
               MarkerLayer(
                 markers: _buildMarkers(),
               ),
             ],
           ),
-          if (_showLayerPanel)
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 200,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Hiển thị:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SwitchListTile(
-                      title: const Text('Quận/Huyện'),
-                      value: _showDistricts,
-onChanged: (bool value) {
-                        setState(() {
-                          _showDistricts = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      title: const Text('Xã/Phường'),
-                      value: _showCommunes,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _showCommunes = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      title: const Text('Điểm trượt lở'),
-                      value: _showLandslidePoints,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _showLandslidePoints = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          Positioned(
-            left: 16,
-            bottom: 16,
-            child: Column(
-              children: [
-                FloatingActionButton(
-                  heroTag: "zoomIn",
-                  mini: true,
-                  onPressed: () {
-                    final newZoom = _mapController.camera.zoom + 1.0;
-                    if (newZoom <= 18.0) {
-                      _mapController.move(
-                        _mapController.camera.center,
-                        newZoom,
-                      );
-                    }
-                  },
-                  child: const Icon(Icons.add),
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton(
-                  heroTag: "zoomOut",
-                  mini: true,
-                  onPressed: () {
-                    final newZoom = _mapController.camera.zoom - 1.0;
-                    if (newZoom >= 4.0) {
-                      _mapController.move(
-                        _mapController.camera.center,
-                        newZoom,
-                      );
-                    }
-                  },
-                  child: const Icon(Icons.remove),
-                ),
-              ],
-            ),
+          // Bảng điều khiển lớp
+          LayerPanel(
+            showLayerPanel: _showLayerPanel,
+            showDistricts: _showDistricts,
+            showCommunes: _showCommunes,
+            showLandslidePoints: _showLandslidePoints,
+            showBorder: _showBorder,
+            onDistrictsChanged: (value) => setState(() => _showDistricts = value),
+            onCommunesChanged: (value) => setState(() => _showCommunes = value),
+            onLandslidePointsChanged: (value) => setState(() => _showLandslidePoints = value),
+            onBorderChanged: (value) => setState(() => _showBorder = value),
           ),
+          // Nút điều khiển zoom
+          MapControls(mapController: _mapController),
         ],
       ),
     );
