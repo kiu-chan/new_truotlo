@@ -4,11 +4,19 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/landslide.dart';
+import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
+import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
 
-// Hàm chính để hiển thị thông tin chi tiết điểm trượt lở
+class RiskLevel {
+  final Color color;
+  final String level;
+  final String value;
+
+  RiskLevel(this.color, this.level, this.value);
+}
+
 Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) async {
   try {
-    // Hiển thị loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -17,14 +25,17 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
       ),
     );
 
-    // Gọi API lấy dữ liệu chi tiết
     final LandslideDatabase database = LandslideDatabase();
-    final detail = await database.fetchLandslideDetail(landslideId);
+    final responses = await Future.wait([
+      database.fetchLandslideDetail(landslideId),
+      database.fetchHourlyForecastPoints(),
+    ]);
 
-    // Đóng loading indicator
+    final detail = responses[0] as Map<String, dynamic>;
+    final forecastResponse = responses[1] as HourlyForecastResponse;
+
     Navigator.of(context).pop();
 
-    // Xử lý danh sách hình ảnh
     List<String> processedImages = [];
     if (detail['images'] != null) {
       processedImages = (detail['images'] as List).map((imagePath) {
@@ -32,7 +43,24 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
       }).toList();
     }
 
-    // Hiển thị dialog với thông tin chi tiết
+    Map<String, dynamic>? warningData;
+    if (forecastResponse.data.isNotEmpty) {
+      final latestHourKey = forecastResponse.data.keys.first;
+      final latestHourData = forecastResponse.data[latestHourKey] ?? [];
+      
+      try {
+        final matchingPoint = latestHourData.firstWhere(
+          (point) => point.landslideId == landslideId,
+        );
+        warningData = matchingPoint.toJson();
+      } catch (e) {
+        // Không tìm thấy điểm tương ứng
+        warningData = null;
+      }
+    }
+
+    if (!context.mounted) return;
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -53,6 +81,10 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildInfoSection(detail),
+                      if (warningData != null) ...[
+                        const SizedBox(height: 16),
+                        _buildWarningSection(warningData),
+                      ],
                       if (processedImages.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         _buildImageSection(context, processedImages),
@@ -67,10 +99,8 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
       ),
     );
   } catch (e) {
-    // Đóng loading indicator nếu có lỗi
+    if (!context.mounted) return;
     Navigator.of(context).pop();
-    
-    // Hiển thị thông báo lỗi
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Có lỗi xảy ra: $e'),
@@ -80,10 +110,10 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
   }
 }
 
-// Widget cho phần header của dialog
+// Các widget và hàm phụ trợ khác giữ nguyên như cũ
 Widget _buildDialogHeader(BuildContext context) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: Theme.of(context).primaryColor,
       borderRadius: const BorderRadius.only(
@@ -113,7 +143,6 @@ Widget _buildDialogHeader(BuildContext context) {
   );
 }
 
-// Widget hiển thị thông tin chi tiết
 Widget _buildInfoSection(Map<String, dynamic> detail) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +157,110 @@ Widget _buildInfoSection(Map<String, dynamic> detail) {
   );
 }
 
-// Widget hiển thị một dòng thông tin
+Widget _buildWarningSection(Map<String, dynamic> warningData) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Padding(
+        padding: EdgeInsets.only(bottom: 8),
+        child: Text(
+          'Cảnh báo hiện tại:',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      _buildWarningRow(
+        'Nguy cơ lũ quét',
+        _getRiskLevel(warningData['nguy_co_lu_quet']),
+      ),
+      _buildWarningRow(
+        'Nguy cơ trượt nông',
+        _getRiskLevel(warningData['nguy_co_truot_nong']),
+      ),
+      _buildWarningRow(
+        'Nguy cơ trượt lớn',
+        _getRiskLevel(warningData['nguy_co_truot_lon']),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        'Cập nhật: ${warningData['created_at']}',
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.grey,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildWarningRow(String label, RiskLevel risk) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      children: [
+        SizedBox(
+          width: 120,
+          child: Text(
+            '$label:',
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: risk.color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: risk.color),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                risk.value,
+                style: TextStyle(
+                  color: risk.color,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '(${risk.level})',
+                style: TextStyle(
+                  color: risk.color,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+RiskLevel _getRiskLevel(dynamic value) {
+  try {
+    final level = double.parse(value.toString());
+    if (level >= 5) {
+      return RiskLevel(Colors.purple, 'Rất cao', value.toString());
+    } else if (level >= 4) {
+      return RiskLevel(Colors.red, 'Cao', value.toString());
+    } else if (level >= 3) {
+      return RiskLevel(Colors.yellow[700]!, 'Trung bình', value.toString());
+    } else if (level >= 2) {
+      return RiskLevel(Colors.green, 'Thấp', value.toString());
+    } else {
+      return RiskLevel(Colors.blue, 'Rất thấp', value.toString());
+    }
+  } catch (e) {
+    return RiskLevel(Colors.grey, 'Không xác định', 'N/A');
+  }
+}
+
 Widget _buildInfoRow(String label, String value) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 8),
@@ -152,23 +284,16 @@ Widget _buildInfoRow(String label, String value) {
   );
 }
 
-// Widget hiển thị phần hình ảnh
 Widget _buildImageSection(BuildContext context, List<String> images) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Hình ảnh:',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          Text('${images.length} hình'),
-        ],
+      const Text(
+        'Hình ảnh:',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
       ),
       const SizedBox(height: 8),
       SizedBox(
@@ -187,7 +312,6 @@ Widget _buildImageSection(BuildContext context, List<String> images) {
   );
 }
 
-// Widget hiển thị một item hình ảnh
 Widget _buildImageItem(BuildContext context, String imageUrl, VoidCallback onTap) {
   return Padding(
     padding: const EdgeInsets.only(right: 8),
@@ -213,32 +337,12 @@ Widget _buildImageItem(BuildContext context, String imageUrl, VoidCallback onTap
                 child: CircularProgressIndicator(),
               ),
             ),
-            errorWidget: (context, url, error) {
-              print('Error loading image: $error for URL: $url');
-              return Container(
-                color: Colors.grey[200],
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 32,
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Không thể tải hình',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+            errorWidget: (context, url, error) => Container(
+              color: Colors.grey[200],
+              child: const Center(
+                child: Icon(Icons.error_outline, color: Colors.red),
+              ),
+            ),
           ),
         ),
       ),
@@ -246,7 +350,6 @@ Widget _buildImageItem(BuildContext context, String imageUrl, VoidCallback onTap
   );
 }
 
-// Chức năng xem hình ảnh toàn màn hình
 void _showFullScreenImage(BuildContext context, List<String> images, int initialIndex) {
   Navigator.push(
     context,
@@ -263,21 +366,6 @@ void _showFullScreenImage(BuildContext context, List<String> images, int initial
                   initialScale: PhotoViewComputedScale.contained,
                   minScale: PhotoViewComputedScale.contained,
                   maxScale: PhotoViewComputedScale.covered * 2,
-                  errorBuilder: (context, error, stackTrace) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error, color: Colors.white),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Không thể tải hình',
-                          style: TextStyle(
-                            color: Colors.red[300],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 );
               },
               itemCount: images.length,
@@ -291,34 +379,24 @@ void _showFullScreenImage(BuildContext context, List<String> images, int initial
               ),
               pageController: PageController(initialPage: initialIndex),
             ),
-            Positioned(
-              top: 40,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: Colors.black26,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: SafeArea(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Hình ${initialIndex + 1}/${images.length}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Hình ${initialIndex + 1}/${images.length}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
               ),
             ),
