@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:new_truotlo/src/page/map/elements/map_icons.dart';
+import 'package:new_truotlo/src/page/map/elements/map_legend.dart';
 import 'menu.dart';
 import 'map_state.dart';
 
@@ -11,10 +13,9 @@ class MapPage extends StatefulWidget {
 }
 
 class MapPageState extends State<MapPage> with MapState {
-  // Định nghĩa bounds cho Bình Định
   final LatLngBounds binhDinhBounds = LatLngBounds(
-    southwest: const LatLng(13.0830, 108.0965), // Mở rộng về phía tây nam
-    northeast: const LatLng(14.9088, 109.8837), // Mở rộng về phía đông bắc
+    southwest: const LatLng(13.0830, 108.0965),
+    northeast: const LatLng(14.9088, 109.8837),
   );
 
   late CameraPosition _lastValidCameraPosition;
@@ -30,97 +31,17 @@ class MapPageState extends State<MapPage> with MapState {
     );
   }
 
-  Widget buildRiskIcon(String riskLevel) {
-    switch (riskLevel) {
-      case 'no_risk':
-        return Image.asset('lib/assets/map/landslide_0.png',
-            width: 16, height: 16);
-      case 'very_low':
-        return Image.asset('lib/assets/map/landslide_1.png',
-            width: 16, height: 16);
-      case 'low':
-        return Image.asset('lib/assets/map/landslide_2.png',
-            width: 16, height: 16);
-      case 'medium':
-        return Image.asset('lib/assets/map/landslide_3.png',
-            width: 16, height: 16);
-      case 'high':
-        return Image.asset('lib/assets/map/landslide_4.png',
-            width: 16, height: 16);
-      case 'very_high':
-        return Image.asset('lib/assets/map/landslide_5.png',
-            width: 16, height: 16);
-      default:
-        return const SizedBox.shrink();
-    }
-  }
-
-  Widget buildLegend(String riskLevel, String text) {
-    return Row(
-      children: [
-        buildRiskIcon(riskLevel),
-        const SizedBox(width: 8),
-        Text(text),
-      ],
-    );
-  }
-
-  Widget buildAdministrativeLegend(String text, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 20,
-          height: 3,
-          color: color,
-        ),
-        const SizedBox(width: 8),
-        Text(text),
-      ],
-    );
-  }
-
   void showInfoPopup() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Chú giải bản đồ'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const Text('Lớp hành chính:',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                buildAdministrativeLegend('Ranh giới', Colors.pink),
-                buildAdministrativeLegend('Ranh giới huyện', Colors.black),
-                buildAdministrativeLegend('Ranh giới xã', Colors.grey),
-                const SizedBox(height: 16),
-                const Text('Điểm trượt lở:',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                buildLegend('no_risk', 'Không có nguy cơ'),
-                buildLegend('very_low', 'Rất thấp'),
-                buildLegend('low', 'Thấp'),
-                buildLegend('medium', 'Trung bình'),
-                buildLegend('high', 'Cao'),
-                buildLegend('very_high', 'Rất cao'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Đóng'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return MapLegend(buildRiskIcon: MapIcons.buildRiskIcon);
       },
     );
   }
 
   void _checkAndUpdateCamera(CameraPosition position) {
     if (!_isPositionInBounds(position.target)) {
-      // Nếu camera di chuyển ra ngoài bounds, quay lại vị trí cuối cùng hợp lệ
       mapController.moveCamera(
         CameraUpdate.newCameraPosition(_lastValidCameraPosition),
       );
@@ -160,9 +81,7 @@ class MapPageState extends State<MapPage> with MapState {
         _lastValidCameraPosition = newPosition;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Vị trí hiện tại nằm ngoài khu vực Bình Định'),
-          ),
+          const SnackBar(content: Text('Vị trí hiện tại nằm ngoài khu vực Bình Định')),
         );
       }
     }
@@ -226,15 +145,9 @@ class MapPageState extends State<MapPage> with MapState {
             minMaxZoomPreference: const MinMaxZoomPreference(5.0, 18.0),
             compassEnabled: true,
             compassViewPosition: CompassViewPosition.TopRight,
-            onMapClick: (_, __) {
-              // Có thể xử lý sự kiện click trên bản đồ ở đây
-            },
-            onCameraTrackingDismissed: () {
-              // Xử lý khi tracking bị hủy
-            },
+            onCameraTrackingDismissed: () {},
             trackCameraPosition: true,
             onMapIdle: () {
-              // Kiểm tra vị trí cuối cùng sau khi camera dừng
               if (mapController.cameraPosition != null) {
                 _checkAndUpdateCamera(mapController.cameraPosition!);
               }
@@ -250,9 +163,7 @@ class MapPageState extends State<MapPage> with MapState {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black26, blurRadius: 8)
-                  ],
+                  boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
                 ),
                 child: Text(
                   'Vị trí cá nhân hiện tại: ${currentLocation!.latitude.toStringAsFixed(6)}, ${currentLocation!.longitude.toStringAsFixed(6)}',
