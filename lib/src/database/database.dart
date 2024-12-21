@@ -1,9 +1,8 @@
-import 'package:latlong2/latlong.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:new_truotlo/src/data/account/user.dart';
 import 'package:new_truotlo/src/data/manage/forecast.dart';
 import 'package:new_truotlo/src/data/manage/hourly_warning.dart';
 import 'package:new_truotlo/src/data/manage/landslide_point.dart';
-import 'package:new_truotlo/src/data/map/commune.dart';
 import 'package:new_truotlo/src/data/map/district_data.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/account.dart';
@@ -43,7 +42,7 @@ class DefaultDatabase {
   bool get connectionFailed => _connectionFailed;
 
   Future<List<List<LatLng>>> fetchAndParseGeometry() async {
-    return await borderDatabase.fetchAndParseGeometry();
+   return await borderDatabase.fetchAndParseGeometry();
   }
 
   Future<List<District>> fetchDistrictsData() async {
