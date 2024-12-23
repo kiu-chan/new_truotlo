@@ -1,6 +1,9 @@
+// lib/src/page/map/map_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:new_truotlo/src/page/map/utils/map_markers.dart';
 import 'package:new_truotlo/src/page/map/widgets/landslide_info_dialog.dart';
 import 'package:new_truotlo/src/page/map/widgets/layer_panel.dart';
 import 'package:new_truotlo/src/page/map/widgets/map_controls.dart';
@@ -8,6 +11,7 @@ import 'package:new_truotlo/src/data/map/district_data.dart';
 import 'package:new_truotlo/src/data/map/commune.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/database.dart';
+import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -24,9 +28,10 @@ class _MapPageState extends State<MapPage> {
   List<Commune> _communes = [];
   List<LandslidePoint> _landslidePoints = [];
   List<List<LatLng>> _borderPolygons = [];
+  HourlyForecastResponse? _forecastResponse;
   bool _isLoading = true;
 
-  // Các trạng thái hiển thị các lớp trên bản đồ
+  // Trạng thái hiển thị các lớp trên bản đồ
   bool _showDistricts = true;
   bool _showCommunes = false;
   bool _showLandslidePoints = true;
@@ -43,7 +48,6 @@ class _MapPageState extends State<MapPage> {
     _loadData();
   }
 
-  // Hàm tải dữ liệu từ server
   Future<void> _loadData() async {
     try {
       setState(() {
@@ -52,12 +56,12 @@ class _MapPageState extends State<MapPage> {
 
       await _database.connect();
       
-      // Tải dữ liệu song song để tối ưu thời gian
       final futures = await Future.wait([
         _database.fetchDistrictsData(),
         _database.fetchCommunesData(),
         _database.fetchLandslidePoints(),
         _database.fetchAndParseGeometry(),
+        _database.fetchHourlyForecastPoints(),
       ]);
       
       setState(() {
@@ -65,6 +69,7 @@ class _MapPageState extends State<MapPage> {
         _communes = futures[1] as List<Commune>;
         _landslidePoints = futures[2] as List<LandslidePoint>;
         _borderPolygons = futures[3] as List<List<LatLng>>;
+        _forecastResponse = futures[4] as HourlyForecastResponse;
         _isLoading = false;
       });
     } catch (e) {
@@ -141,22 +146,12 @@ class _MapPageState extends State<MapPage> {
 
   // Xây dựng các marker cho điểm trượt lở
   List<Marker> _buildMarkers() {
-    if (!_showLandslidePoints) return [];
-    
-    return _landslidePoints.map((point) {
-      return Marker(
-        point: point.location,
-        width: 32,
-        height: 32,
-        child: GestureDetector(
-          onTap: () => showLandslideInfoDialog(context, point.id),
-          child: Image.asset(
-            'lib/assets/map/landslide_0.png',
-            fit: BoxFit.contain,
-          ),
-        ),
-      );
-    }).toList();
+    return MapMarkersHandler.buildMarkers(
+      points: _landslidePoints,
+      showLandslidePoints: _showLandslidePoints,
+      onTap: (id) => showLandslideInfoDialog(context, id),
+      forecastResponse: _forecastResponse,
+    );
   }
 
   @override

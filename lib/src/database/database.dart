@@ -1,5 +1,6 @@
 import 'package:latlong2/latlong.dart';
 import 'package:new_truotlo/src/data/account/user.dart';
+import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
 import 'package:new_truotlo/src/data/manage/forecast.dart';
 import 'package:new_truotlo/src/data/manage/hourly_warning.dart';
 import 'package:new_truotlo/src/data/manage/landslide_point.dart';
@@ -72,6 +73,10 @@ class DefaultDatabase {
 
   Future<List<ManageLandslidePoint>> fetchListLandslidePoints() async {
     return await landslideDatabase.fetchListLandslidePoints();
+  }
+
+  Future<HourlyForecastResponse> fetchHourlyForecastPoints() async {
+    return await landslideDatabase.fetchHourlyForecastPoints();
   }
 
   Future<List<String>> getAllDistricts() async {

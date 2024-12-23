@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
@@ -253,8 +255,10 @@ RiskLevel _getRiskLevel(dynamic value) {
       return RiskLevel(Colors.yellow[700]!, 'Trung bình', value.toString());
     } else if (level >= 2) {
       return RiskLevel(Colors.green, 'Thấp', value.toString());
-    } else {
+    } else if (level >  1){
       return RiskLevel(Colors.blue, 'Rất thấp', value.toString());
+    } else {
+      return RiskLevel(Colors.grey, 'Không có', 'N/A');
     }
   } catch (e) {
     return RiskLevel(Colors.grey, 'Không xác định', 'N/A');
