@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 
 class MapControls extends StatelessWidget {
   final MapController mapController;
@@ -11,12 +10,12 @@ class MapControls extends StatelessWidget {
   final double maxZoom;
 
   const MapControls({
-    Key? key,
+    super.key,
     required this.mapController,
     required this.onDefaultLocationPressed,
     this.minZoom = 4.0,
     this.maxZoom = 18.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +59,8 @@ class MapControls extends StatelessWidget {
             mini: true,
             onPressed: onDefaultLocationPressed,
             backgroundColor: Theme.of(context).primaryColor,
-            child: const Icon(Icons.home),
             tooltip: 'Về vị trí mặc định',
+            child: const Icon(Icons.home),
           ),
         ],
       ),

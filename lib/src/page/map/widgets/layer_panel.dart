@@ -12,7 +12,7 @@ class LayerPanel extends StatelessWidget {
   final Function(bool) onBorderChanged;  // New parameter
 
   const LayerPanel({
-    Key? key,
+    super.key,
     required this.showLayerPanel,
     required this.showDistricts,
     required this.showCommunes,
@@ -22,7 +22,7 @@ class LayerPanel extends StatelessWidget {
     required this.onCommunesChanged,
     required this.onLandslidePointsChanged,
     required this.onBorderChanged,  // New parameter
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

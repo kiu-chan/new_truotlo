@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:new_truotlo/src/database/database.dart';
 class InformationPage extends StatefulWidget {
-  const InformationPage({Key? key}) : super(key: key);
+  const InformationPage({super.key});
 
   @override
   InformationPageState createState() => InformationPageState();

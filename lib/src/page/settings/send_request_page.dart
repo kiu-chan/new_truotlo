@@ -250,9 +250,9 @@ class SendRequestPageState extends State<SendRequestPage> {
                                         AlwaysStoppedAnimation<Color>(Colors.white),
                                   ),
                                 )
-                              : Row(
+                              : const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
+                                  children: [
                                     Icon(Icons.send),
                                     SizedBox(width: 8),
                                     Text(
