@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:new_truotlo/src/page/map/utils/map_markers.dart';
+import 'package:new_truotlo/src/page/map/utils/map_bounds_handler.dart';
 import 'package:new_truotlo/src/page/map/widgets/landslide_info_dialog.dart';
 import 'package:new_truotlo/src/page/map/widgets/layer_panel.dart';
 import 'package:new_truotlo/src/page/map/widgets/map_controls.dart';
@@ -46,15 +47,23 @@ class _MapPageState extends State<MapPage> {
   LatLng? _currentLocation;
   bool _isTrackingLocation = false;
 
+  // Map bounds state
+  late LatLngBounds _mapBounds;
+
   // Map constants
   static const LatLng _binhDinhCenter = LatLng(14.1766, 109.1746);
   static const double _initialZoom = 9.0;
-  static const double _minZoom = 4.0;
+  static const double _minZoom = 8.0;
   static const double _maxZoom = 18.0;
 
   @override
   void initState() {
     super.initState();
+    // Khởi tạo bounds mặc định cho Bình Định
+    _mapBounds = LatLngBounds(
+      const LatLng(13.5, 108.5),  // South West
+      const LatLng(14.5, 109.5),  // North East
+    );
     _loadData();
     _checkLocationPermission();
   }
@@ -88,6 +97,10 @@ class _MapPageState extends State<MapPage> {
         _landslidePoints = futures[2] as List<LandslidePoint>;
         _borderPolygons = futures[3] as List<List<LatLng>>;
         _forecastResponse = futures[4] as HourlyForecastResponse;
+        
+        // Cập nhật bounds dựa trên polygon ranh giới
+        _mapBounds = MapBoundsHandler.calculateBounds(_borderPolygons);
+        
         _isLoading = false;
       });
     } catch (e) {
@@ -140,11 +153,13 @@ class _MapPageState extends State<MapPage> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      final newLocation = LatLng(position.latitude, position.longitude);
+      
       setState(() {
-        _currentLocation = LatLng(position.latitude, position.longitude);
+        _currentLocation = MapBoundsHandler.enforceCenter(newLocation, _mapBounds);
       });
 
-      // Di chuyển bản đồ đến vị trí hiện tại
+      // Di chuyển bản đồ đến vị trí hiện tại (trong bounds)
       _mapController.move(_currentLocation!, 15.0);
 
     } catch (e) {
@@ -163,7 +178,8 @@ class _MapPageState extends State<MapPage> {
 
   // Di chuyển về vị trí mặc định
   void _moveToDefaultLocation() {
-    _mapController.move(_binhDinhCenter, _initialZoom);
+    final center = MapBoundsHandler.enforceCenter(_binhDinhCenter, _mapBounds);
+    _mapController.move(center, _initialZoom);
   }
 
   // Xây dựng các polygon cho bản đồ
@@ -227,12 +243,14 @@ class _MapPageState extends State<MapPage> {
     final List<Marker> markers = [];
     
     // Thêm các markers điểm trượt lở
-    markers.addAll(MapMarkersHandler.buildMarkers(
-      points: _landslidePoints,
-      showLandslidePoints: _showLandslidePoints,
-      onTap: (id) => showLandslideInfoDialog(context, id),
-      forecastResponse: _forecastResponse,
-    ));
+    if (_showLandslidePoints) {
+      markers.addAll(MapMarkersHandler.buildMarkers(
+        points: _landslidePoints,
+        showLandslidePoints: _showLandslidePoints,
+        onTap: (id) => showLandslideInfoDialog(context, id),
+        forecastResponse: _forecastResponse,
+      ));
+    }
 
     // Thêm marker vị trí hiện tại nếu có
     if (_currentLocation != null) {
@@ -308,6 +326,23 @@ class _MapPageState extends State<MapPage> {
               initialZoom: _initialZoom,
               minZoom: _minZoom,
               maxZoom: _maxZoom,
+              // Thêm bounds và các options liên quan
+              bounds: _mapBounds,
+              boundsOptions: const FitBoundsOptions(
+                padding: EdgeInsets.all(20),
+              ),
+              // Sự kiện khi kéo bản đồ
+              onPositionChanged: (MapPosition position, bool hasGesture) {
+                if (hasGesture && position.center != null) {
+                  final newCenter = MapBoundsHandler.enforceCenter(
+                    position.center!,
+                    _mapBounds,
+                  );
+                  if (newCenter != position.center) {
+                    _mapController.move(newCenter, position.zoom ?? _initialZoom);
+                  }
+                }
+              },
               interactionOptions: const InteractionOptions(
                 enableScrollWheel: true,
                 enableMultiFingerGestureRace: true,
