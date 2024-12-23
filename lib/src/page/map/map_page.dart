@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:new_truotlo/src/page/map/utils/location_permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:new_truotlo/src/page/map/utils/map_markers.dart';
 import 'package:new_truotlo/src/page/map/widgets/landslide_info_dialog.dart';
 import 'package:new_truotlo/src/page/map/widgets/layer_panel.dart';
@@ -21,38 +24,54 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  // Controllers
   final DefaultDatabase _database = DefaultDatabase();
   final MapController _mapController = MapController();
   
+  // Data states
   List<District> _districts = [];
   List<Commune> _communes = [];
   List<LandslidePoint> _landslidePoints = [];
   List<List<LatLng>> _borderPolygons = [];
   HourlyForecastResponse? _forecastResponse;
+  
+  // UI states
   bool _isLoading = true;
-
-  // Trạng thái hiển thị các lớp trên bản đồ
+  bool _showLayerPanel = false;
   bool _showDistricts = true;
   bool _showCommunes = false;
   bool _showLandslidePoints = true;
-  bool _showLayerPanel = false;
   bool _showBorder = true;
+  
+  // Location tracking states
+  LatLng? _currentLocation;
+  bool _isTrackingLocation = false;
 
-  // Vị trí trung tâm của Bình Định
+  // Constants
   static const LatLng _binhDinhCenter = LatLng(14.1766, 109.1746);
   static const double _initialZoom = 9.0;
+  static const double _minZoom = 4.0;
+  static const double _maxZoom = 18.0;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _checkLocationPermission();
   }
 
+  // Kiểm tra và yêu cầu quyền truy cập vị trí
+  Future<void> _checkLocationPermission() async {
+    final status = await Permission.location.status;
+    if (status.isDenied) {
+      await Permission.location.request();
+    }
+  }
+
+  // Load dữ liệu từ database
   Future<void> _loadData() async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
       await _database.connect();
       
@@ -74,9 +93,7 @@ class _MapPageState extends State<MapPage> {
       });
     } catch (e) {
       print('Error loading map data: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -87,6 +104,43 @@ class _MapPageState extends State<MapPage> {
       }
     }
   }
+
+
+Future<void> _getCurrentLocation() async {
+  try {
+    setState(() => _isTrackingLocation = true);
+
+    // Xử lý quyền truy cập vị trí
+    final hasPermission = await LocationPermissionHandler.handleLocationPermission(context);
+    if (!hasPermission) {
+      return;
+    }
+
+    // Lấy vị trí hiện tại
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      _currentLocation = LatLng(position.latitude, position.longitude);
+    });
+
+    // Di chuyển bản đồ đến vị trí hiện tại
+    _mapController.move(_currentLocation!, 15.0);
+
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Không thể lấy vị trí: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } finally {
+    setState(() => _isTrackingLocation = false);
+  }
+}
 
   // Xây dựng các polygon cho bản đồ
   List<Polygon> _buildPolygons() {
@@ -144,14 +198,42 @@ class _MapPageState extends State<MapPage> {
     return polygons;
   }
 
-  // Xây dựng các marker cho điểm trượt lở
+  // Xây dựng các marker cho bản đồ
   List<Marker> _buildMarkers() {
-    return MapMarkersHandler.buildMarkers(
+    final List<Marker> markers = [];
+    
+    // Thêm các markers điểm trượt lở
+    markers.addAll(MapMarkersHandler.buildMarkers(
       points: _landslidePoints,
       showLandslidePoints: _showLandslidePoints,
       onTap: (id) => showLandslideInfoDialog(context, id),
       forecastResponse: _forecastResponse,
-    );
+    ));
+
+    // Thêm marker vị trí hiện tại nếu có
+    if (_currentLocation != null) {
+      markers.add(
+        Marker(
+          point: _currentLocation!,
+          width: 30,
+          height: 30,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.7),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: const Icon(
+              Icons.my_location,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return markers;
   }
 
   @override
@@ -175,6 +257,13 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(
         title: const Text('Bản đồ'),
         actions: [
+          // Nút định vị
+          IconButton(
+            icon: Icon(_isTrackingLocation ? Icons.gps_fixed : Icons.gps_not_fixed),
+            onPressed: _isTrackingLocation ? null : _getCurrentLocation,
+            tooltip: 'Vị trí của tôi',
+          ),
+          // Nút hiển thị layer panel
           IconButton(
             icon: Icon(_showLayerPanel ? Icons.layers : Icons.layers_outlined),
             onPressed: () {
@@ -188,14 +277,13 @@ class _MapPageState extends State<MapPage> {
       ),
       body: Stack(
         children: [
-          // Widget bản đồ chính
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
               initialCenter: _binhDinhCenter,
               initialZoom: _initialZoom,
-              minZoom: 4.0,
-              maxZoom: 18.0,
+              minZoom: _minZoom,
+              maxZoom: _maxZoom,
               interactionOptions: const InteractionOptions(
                 enableScrollWheel: true,
                 enableMultiFingerGestureRace: true,
@@ -212,7 +300,7 @@ class _MapPageState extends State<MapPage> {
               PolygonLayer(
                 polygons: _buildPolygons(),
               ),
-              // Lớp các marker điểm trượt lở
+              // Lớp các marker
               MarkerLayer(
                 markers: _buildMarkers(),
               ),
