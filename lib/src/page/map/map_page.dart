@@ -296,27 +296,6 @@ class _MapPageState extends State<MapPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bản đồ'),
-        actions: [
-          // Nút định vị
-          IconButton(
-            icon: Icon(_isTrackingLocation ? Icons.gps_fixed : Icons.gps_not_fixed),
-            onPressed: _isTrackingLocation ? null : _getCurrentLocation,
-            tooltip: 'Vị trí của tôi',
-          ),
-          // Nút hiển thị layer panel
-          IconButton(
-            icon: Icon(_showLayerPanel ? Icons.layers : Icons.layers_outlined),
-            onPressed: () {
-              setState(() {
-                _showLayerPanel = !_showLayerPanel;
-              });
-            },
-            tooltip: 'Hiển thị/Ẩn bảng điều khiển lớp',
-          ),
-        ],
-      ),
       body: Stack(
         children: [
           FlutterMap(
@@ -326,12 +305,10 @@ class _MapPageState extends State<MapPage> {
               initialZoom: _initialZoom,
               minZoom: _minZoom,
               maxZoom: _maxZoom,
-              // Thêm bounds và các options liên quan
               bounds: _mapBounds,
               boundsOptions: const FitBoundsOptions(
                 padding: EdgeInsets.all(20),
               ),
-              // Sự kiện khi kéo bản đồ
               onPositionChanged: (MapPosition position, bool hasGesture) {
                 if (hasGesture && position.center != null) {
                   final newCenter = MapBoundsHandler.enforceCenter(
@@ -349,23 +326,45 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
             children: [
-              // Lớp nền OpenStreetMap
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.app',
                 subdomains: const ['a', 'b', 'c'],
               ),
-              // Lớp các polygon
               PolygonLayer(
                 polygons: _buildPolygons(),
               ),
-              // Lớp các marker
               MarkerLayer(
                 markers: _buildMarkers(),
               ),
             ],
           ),
-          // Bảng điều khiển lớp
+          
+          // Menu button (top-right)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            right: 8,
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  _showLayerPanel ? Icons.layers : Icons.layers_outlined,
+                  color: Colors.black87,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _showLayerPanel = !_showLayerPanel;
+                  });
+                },
+                tooltip: 'Hiển thị/Ẩn bảng điều khiển lớp',
+              ),
+            ),
+          ),
+          
+          // Layer panel
           LayerPanel(
             showLayerPanel: _showLayerPanel,
             showDistricts: _showDistricts,
@@ -376,11 +375,15 @@ class _MapPageState extends State<MapPage> {
             onCommunesChanged: (value) => setState(() => _showCommunes = value),
             onLandslidePointsChanged: (value) => setState(() => _showLandslidePoints = value),
             onBorderChanged: (value) => setState(() => _showBorder = value),
+            onClose: () => setState(() => _showLayerPanel = false),
           ),
-          // Nút điều khiển bản đồ
+          
+          // Map controls (including location button)
           MapControls(
             mapController: _mapController,
             onDefaultLocationPressed: _moveToDefaultLocation,
+            onLocationPressed: _getCurrentLocation,
+            isTrackingLocation: _isTrackingLocation,
             minZoom: _minZoom,
             maxZoom: _maxZoom,
           ),

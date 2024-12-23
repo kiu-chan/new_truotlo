@@ -6,6 +6,8 @@ import 'package:flutter_map/flutter_map.dart';
 class MapControls extends StatelessWidget {
   final MapController mapController;
   final VoidCallback onDefaultLocationPressed;
+  final VoidCallback onLocationPressed;
+  final bool isTrackingLocation;
   final double minZoom;
   final double maxZoom;
 
@@ -13,6 +15,8 @@ class MapControls extends StatelessWidget {
     super.key,
     required this.mapController,
     required this.onDefaultLocationPressed,
+    required this.onLocationPressed,
+    required this.isTrackingLocation,
     this.minZoom = 4.0,
     this.maxZoom = 18.0,
   });
@@ -22,47 +26,92 @@ class MapControls extends StatelessWidget {
     return Positioned(
       left: 16,
       bottom: 16,
-      child: Column(
-        children: [
-          FloatingActionButton(
-            heroTag: "zoomIn",
-            mini: true,
-            onPressed: () {
-              final newZoom = mapController.camera.zoom + 1.0;
-              if (newZoom <= maxZoom) {
-                mapController.move(
-                  mapController.camera.center,
-                  newZoom,
-                );
-              }
-            },
-            child: const Icon(Icons.add),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildControlButton(
+                context,
+                icon: Icons.add,
+                tooltip: 'Phóng to',
+                heroTag: 'zoomIn',
+                onPressed: () {
+                  final newZoom = mapController.camera.zoom + 1.0;
+                  if (newZoom <= maxZoom) {
+                    mapController.move(
+                      mapController.camera.center,
+                      newZoom,
+                    );
+                  }
+                },
+              ),
+              const Divider(height: 1),
+              _buildControlButton(
+                context,
+                icon: Icons.remove,
+                tooltip: 'Thu nhỏ',
+                heroTag: 'zoomOut',
+                onPressed: () {
+                  final newZoom = mapController.camera.zoom - 1.0;
+                  if (newZoom >= minZoom) {
+                    mapController.move(
+                      mapController.camera.center,
+                      newZoom,
+                    );
+                  }
+                },
+              ),
+              const Divider(height: 1),
+              _buildControlButton(
+                context,
+                icon: Icons.home,
+                tooltip: 'Về vị trí mặc định',
+                heroTag: 'defaultLocation',
+                onPressed: onDefaultLocationPressed,
+                color: Theme.of(context).primaryColor,
+              ),
+              const Divider(height: 1),
+              _buildControlButton(
+                context,
+                icon: isTrackingLocation ? Icons.gps_fixed : Icons.gps_not_fixed,
+                tooltip: 'Vị trí của tôi',
+                heroTag: 'location',
+                onPressed: isTrackingLocation ? null : onLocationPressed,
+                color: isTrackingLocation ? Colors.grey : Theme.of(context).primaryColor,
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          FloatingActionButton(
-            heroTag: "zoomOut",
-            mini: true,
-            onPressed: () {
-              final newZoom = mapController.camera.zoom - 1.0;
-              if (newZoom >= minZoom) {
-                mapController.move(
-                  mapController.camera.center,
-                  newZoom,
-                );
-              }
-            },
-            child: const Icon(Icons.remove),
-          ),
-          const SizedBox(height: 8),
-          FloatingActionButton(
-            heroTag: "defaultLocation",
-            mini: true,
-            onPressed: onDefaultLocationPressed,
-            backgroundColor: Theme.of(context).primaryColor,
-            tooltip: 'Về vị trí mặc định',
-            child: const Icon(Icons.home),
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildControlButton(
+    BuildContext context, {
+    required IconData icon,
+    required String tooltip,
+    required String heroTag,
+    required VoidCallback? onPressed,
+    Color? color,
+  }) {
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        icon: Icon(
+          icon,
+          size: 20,
+          color: color ?? Colors.black87,
+        ),
+        tooltip: tooltip,
+        onPressed: onPressed,
       ),
     );
   }

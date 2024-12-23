@@ -5,11 +5,12 @@ class LayerPanel extends StatelessWidget {
   final bool showDistricts;
   final bool showCommunes;
   final bool showLandslidePoints;
-  final bool showBorder;  // New parameter
+  final bool showBorder;
   final Function(bool) onDistrictsChanged;
   final Function(bool) onCommunesChanged;
   final Function(bool) onLandslidePointsChanged;
-  final Function(bool) onBorderChanged;  // New parameter
+  final Function(bool) onBorderChanged;
+  final VoidCallback onClose;
 
   const LayerPanel({
     super.key,
@@ -17,56 +18,129 @@ class LayerPanel extends StatelessWidget {
     required this.showDistricts,
     required this.showCommunes,
     required this.showLandslidePoints,
-    required this.showBorder,  // New parameter
+    required this.showBorder,
     required this.onDistrictsChanged,
     required this.onCommunesChanged,
     required this.onLandslidePointsChanged,
-    required this.onBorderChanged,  // New parameter
+    required this.onBorderChanged,
+    required this.onClose,
   });
 
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 200),
-      right: showLayerPanel ? 0 : -200,
+      right: showLayerPanel ? 0 : -250,
       top: 0,
       bottom: 0,
-      width: 200,
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(8),
+      width: 250,
+      child: Card(
+        margin: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+          bottom: 8,
+          right: 8,
+        ),
+        elevation: 4,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Hiển thị:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                  topRight: Radius.circular(4),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.layers, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Lớp bản đồ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: onClose,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    tooltip: 'Đóng',
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              title: const Text('Ranh giới tỉnh'),
-              value: showBorder,
-              onChanged: onBorderChanged,
-            ),
-            SwitchListTile(
-              title: const Text('Quận/Huyện'),
-              value: showDistricts,
-              onChanged: onDistrictsChanged,
-            ),
-            SwitchListTile(
-              title: const Text('Xã/Phường'),
-              value: showCommunes,
-              onChanged: onCommunesChanged,
-            ),
-            SwitchListTile(
-              title: const Text('Điểm trượt lở'),
-              value: showLandslidePoints,
-              onChanged: onLandslidePointsChanged,
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(8),
+                children: [
+                  _buildLayerSwitch(
+                    'Ranh giới tỉnh',
+                    Icons.blur_on,
+                    showBorder,
+                    onBorderChanged,
+                    context,
+                  ),
+                  _buildLayerSwitch(
+                    'Quận/Huyện',
+                    Icons.location_city,
+                    showDistricts,
+                    onDistrictsChanged,
+                    context,
+                  ),
+                  _buildLayerSwitch(
+                    'Xã/Phường',
+                    Icons.location_on,
+                    showCommunes,
+                    onCommunesChanged,
+                    context,
+                  ),
+                  _buildLayerSwitch(
+                    'Điểm trượt lở',
+                    Icons.warning_amber,
+                    showLandslidePoints,
+                    onLandslidePointsChanged,
+                    context,
+                  ),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLayerSwitch(
+    String title,
+    IconData icon,
+    bool value,
+    ValueChanged<bool> onChanged,
+    BuildContext context,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: ListTile(
+        dense: true,
+        leading: Icon(icon, size: 22),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 14),
+        ),
+        trailing: Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: Theme.of(context).primaryColor,
         ),
       ),
     );
