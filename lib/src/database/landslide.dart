@@ -188,18 +188,27 @@ class LandslideDatabase {
     }
   }
 
-    Future<HourlyForecastResponse> fetchHourlyForecastPoints() async {
+  Future<HourlyForecastResponse> fetchHourlyForecastPoints() async {
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/forecast-points'));
+      final url = '$_baseUrl/forecast-points';
+      final response = await http.get(Uri.parse(url));
       
       if (response.statusCode == 200) {
-        return HourlyForecastResponse.fromJson(json.decode(response.body));
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        return HourlyForecastResponse.fromJson(jsonResponse);
       } else {
-        throw Exception('Failed to load hourly forecast points');
+        throw Exception('Failed to load hourly forecast points. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching hourly forecast points: $e');
-      rethrow;
+      // Return empty response
+      return HourlyForecastResponse(
+        success: false,
+        data: {},
+        filters: {},
+        totalPoints: 0,
+        currentTime: '',
+      );
     }
   }
 }

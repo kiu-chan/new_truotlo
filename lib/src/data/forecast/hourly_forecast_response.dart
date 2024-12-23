@@ -1,3 +1,5 @@
+// lib/src/data/forecast/hourly_forecast_response.dart
+
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
 
 class HourlyForecastResponse {
@@ -5,41 +7,38 @@ class HourlyForecastResponse {
   final Map<String, List<HourlyForecastPoint>> data;
   final Map<String, dynamic> filters;
   final int totalPoints;
+  final String currentTime;
 
   HourlyForecastResponse({
     required this.success,
     required this.data,
     required this.filters,
     required this.totalPoints,
+    required this.currentTime,
   });
 
   factory HourlyForecastResponse.fromJson(Map<String, dynamic> json) {
+    // Khởi tạo map data rỗng
     Map<String, List<HourlyForecastPoint>> parsedData = {};
-    (json['data'] as Map<String, dynamic>).forEach((key, value) {
-      parsedData[key] = (value as List)
-          .map((item) => HourlyForecastPoint.fromJson(item))
-          .toList();
-    });
+    
+    // Xử lý dữ liệu data
+    if (json['data'] != null) {
+      final rawData = json['data'] as Map<String, dynamic>;
+      rawData.forEach((key, value) {
+        if (value is List) {
+          parsedData[key] = value
+              .map((item) => HourlyForecastPoint.fromJson(item))
+              .toList();
+        }
+      });
+    }
 
     return HourlyForecastResponse(
       success: json['success'] ?? false,
       data: parsedData,
       filters: json['filters'] ?? {},
       totalPoints: json['total_points'] ?? 0,
+      currentTime: json['current_time'] ?? '',
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> jsonData = {};
-    data.forEach((key, value) {
-      jsonData[key] = value.map((point) => point.toJson()).toList();
-    });
-
-    return {
-      'success': success,
-      'data': jsonData,
-      'filters': filters,
-      'total_points': totalPoints,
-    };
   }
 }

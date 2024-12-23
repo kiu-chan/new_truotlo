@@ -4,9 +4,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
+import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
 
 class MapMarkersHandler {
   /// Xác định mức độ nguy cơ từ giá trị số
@@ -52,17 +52,20 @@ class MapMarkersHandler {
     if (!showLandslidePoints) return [];
 
     return points.map((point) {
-      // Tìm dữ liệu cảnh báo tương ứng với điểm trượt lở
+      // Kiểm tra và lấy dữ liệu cảnh báo
       HourlyForecastPoint? matchingForecast;
-      if (forecastResponse?.data.isNotEmpty == true) {
-        final latestHourKey = forecastResponse!.data.keys.first;
-        final latestHourData = forecastResponse.data[latestHourKey] ?? [];
+      if (forecastResponse != null && 
+          forecastResponse.data.isNotEmpty && 
+          forecastResponse.totalPoints > 0) {
         try {
+          final latestHourKey = forecastResponse.data.keys.first;
+          final latestHourData = forecastResponse.data[latestHourKey] ?? [];
           matchingForecast = latestHourData.firstWhere(
             (forecast) => forecast.landslideId == point.id,
+            // orElse: () => null,
           );
         } catch (e) {
-          // Không tìm thấy dữ liệu cảnh báo cho điểm này
+          print('Error finding matching forecast for point ${point.id}: $e');
           matchingForecast = null;
         }
       }
