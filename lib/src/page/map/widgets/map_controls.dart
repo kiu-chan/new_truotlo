@@ -1,12 +1,21 @@
+// lib/src/page/map/widgets/map_controls.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapControls extends StatelessWidget {
   final MapController mapController;
+  final VoidCallback onDefaultLocationPressed;
+  final double minZoom;
+  final double maxZoom;
 
   const MapControls({
     Key? key,
     required this.mapController,
+    required this.onDefaultLocationPressed,
+    this.minZoom = 4.0,
+    this.maxZoom = 18.0,
   }) : super(key: key);
 
   @override
@@ -21,7 +30,7 @@ class MapControls extends StatelessWidget {
             mini: true,
             onPressed: () {
               final newZoom = mapController.camera.zoom + 1.0;
-              if (newZoom <= 18.0) {
+              if (newZoom <= maxZoom) {
                 mapController.move(
                   mapController.camera.center,
                   newZoom,
@@ -36,7 +45,7 @@ class MapControls extends StatelessWidget {
             mini: true,
             onPressed: () {
               final newZoom = mapController.camera.zoom - 1.0;
-              if (newZoom >= 4.0) {
+              if (newZoom >= minZoom) {
                 mapController.move(
                   mapController.camera.center,
                   newZoom,
@@ -44,6 +53,15 @@ class MapControls extends StatelessWidget {
               }
             },
             child: const Icon(Icons.remove),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton(
+            heroTag: "defaultLocation",
+            mini: true,
+            onPressed: onDefaultLocationPressed,
+            backgroundColor: Theme.of(context).primaryColor,
+            child: const Icon(Icons.home),
+            tooltip: 'Về vị trí mặc định',
           ),
         ],
       ),

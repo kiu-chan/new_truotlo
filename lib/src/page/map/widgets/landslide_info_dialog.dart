@@ -1,13 +1,17 @@
-import 'dart:math';
+// lib/src/page/map/widgets/landslide_info_dialog.dart
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/landslide.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class RiskLevel {
   final Color color;
@@ -19,6 +23,7 @@ class RiskLevel {
 
 Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) async {
   try {
+    // Hiển thị loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -27,6 +32,7 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
       ),
     );
 
+    // Lấy dữ liệu từ database
     final LandslideDatabase database = LandslideDatabase();
     final responses = await Future.wait([
       database.fetchLandslideDetail(landslideId),
@@ -36,8 +42,9 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
     final detail = responses[0] as Map<String, dynamic>;
     final forecastResponse = responses[1] as HourlyForecastResponse;
 
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(); // Đóng loading indicator
 
+    // Xử lý danh sách hình ảnh
     List<String> processedImages = [];
     if (detail['images'] != null) {
       processedImages = (detail['images'] as List).map((imagePath) {
@@ -45,24 +52,24 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
       }).toList();
     }
 
+    // Lấy dữ liệu cảnh báo mới nhất
     Map<String, dynamic>? warningData;
     if (forecastResponse.data.isNotEmpty) {
       final latestHourKey = forecastResponse.data.keys.first;
       final latestHourData = forecastResponse.data[latestHourKey] ?? [];
-      
       try {
         final matchingPoint = latestHourData.firstWhere(
           (point) => point.landslideId == landslideId,
         );
         warningData = matchingPoint.toJson();
       } catch (e) {
-        // Không tìm thấy điểm tương ứng
         warningData = null;
       }
     }
 
     if (!context.mounted) return;
 
+    // Hiển thị dialog thông tin
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -87,6 +94,8 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
                         const SizedBox(height: 16),
                         _buildWarningSection(warningData),
                       ],
+                      const SizedBox(height: 16),
+                      _buildDirectionsButton(context, detail),
                       if (processedImages.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         _buildImageSection(context, processedImages),
@@ -112,7 +121,6 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
   }
 }
 
-// Các widget và hàm phụ trợ khác giữ nguyên như cũ
 Widget _buildDialogHeader(BuildContext context) {
   return Container(
     padding: const EdgeInsets.all(16),
@@ -244,25 +252,21 @@ Widget _buildWarningRow(String label, RiskLevel risk) {
   );
 }
 
-RiskLevel _getRiskLevel(dynamic value) {
-  try {
-    final level = double.parse(value.toString());
-    if (level >= 5) {
-      return RiskLevel(Colors.purple, 'Rất cao', value.toString());
-    } else if (level >= 4) {
-      return RiskLevel(Colors.red, 'Cao', value.toString());
-    } else if (level >= 3) {
-      return RiskLevel(Colors.yellow[700]!, 'Trung bình', value.toString());
-    } else if (level >= 2) {
-      return RiskLevel(Colors.green, 'Thấp', value.toString());
-    } else if (level >  1){
-      return RiskLevel(Colors.blue, 'Rất thấp', value.toString());
-    } else {
-      return RiskLevel(Colors.grey, 'Không có', 'N/A');
-    }
-  } catch (e) {
-    return RiskLevel(Colors.grey, 'Không xác định', 'N/A');
-  }
+Widget _buildDirectionsButton(BuildContext context, Map<String, dynamic> detail) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: ElevatedButton.icon(
+      onPressed: () => _openGoogleMaps(context, detail),
+      icon: const Icon(Icons.directions),
+      label: const Text('Chỉ đường đến điểm này'),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+      ),
+    ),
+  );
 }
 
 Widget _buildInfoRow(String label, String value) {
@@ -409,4 +413,105 @@ void _showFullScreenImage(BuildContext context, List<String> images, int initial
       ),
     ),
   );
+}
+
+Future<void> _openGoogleMaps(BuildContext context, Map<String, dynamic> detail) async {
+  try {
+    // Kiểm tra quyền truy cập vị trí
+    final permission = await Permission.location.status;
+    if (permission.isDenied) {
+      if (context.mounted) {
+        final result = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Yêu cầu quyền truy cập'),
+            content: const Text('Ứng dụng cần quyền truy cập vị trí để tìm đường đi.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Đồng ý'),
+              ),
+            ],
+          ),
+        );
+        if (result != true) return;
+        await Permission.location.request();
+      }
+    }
+
+    // Lấy vị trí hiện tại
+    Position? currentPosition;
+    try {
+      currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+    } catch (e) {
+      print('Error getting current location: $e');
+    }
+
+    // Tạo URL cho Google Maps
+    final double destLat = double.parse(detail['lat'].toString());
+    final double destLon = double.parse(detail['lon'].toString());
+    String url;
+
+    if (currentPosition != null) {
+      // URL với điểm bắt đầu và điểm đến
+      url = 'https://www.google.com/maps/dir/?api=1'
+          '&origin=${currentPosition.latitude},${currentPosition.longitude}'
+          '&destination=$destLat,$destLon'
+          '&travelmode=driving';
+    } else {
+      // URL chỉ với điểm đến
+      url = 'https://www.google.com/maps/search/?api=1&query=$destLat,$destLon';
+    }
+
+    // Mở Google Maps
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể mở Google Maps'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  } catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Có lỗi xảy ra: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+
+RiskLevel _getRiskLevel(dynamic value) {
+  try {
+    final level = double.parse(value.toString());
+    if (level >= 5) {
+      return RiskLevel(Colors.purple, 'Rất cao', value.toString());
+    } else if (level >= 4) {
+      return RiskLevel(Colors.red, 'Cao', value.toString());
+    } else if (level >= 3) {
+      return RiskLevel(Colors.yellow[700]!, 'Trung bình', value.toString());
+    } else if (level >= 2) {
+      return RiskLevel(Colors.green, 'Thấp', value.toString());
+    } else if (level > 1) {
+      return RiskLevel(Colors.blue, 'Rất thấp', value.toString());
+    } else {
+      return RiskLevel(Colors.grey, 'Không có', 'N/A');
+    }
+  } catch (e) {
+    return RiskLevel(Colors.grey, 'Không xác định', 'N/A');
+  }
 }
