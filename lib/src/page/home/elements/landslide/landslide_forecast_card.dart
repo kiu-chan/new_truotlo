@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
 import 'package:new_truotlo/src/page/home/elements/landslide/daily_forecast_point.dart';
 
@@ -20,13 +19,6 @@ class LandslideForecastCardState extends State<LandslideForecastCard> {
   List<DailyForecastPoint> _dailyForecastPoints = [];
   String _lastUpdateTime = '';
   String _currentHourKey = '';
-  Map<int, int> _riskLevelCounts = {
-    5: 0,
-    4: 0,
-    3: 0,
-    2: 0,
-    1: 0,
-  };
 
   static const String _dailyApiUrl = 'http://truotlobinhdinh.girc.edu.vn/api/forecasts/current';
   static const String _hourlyApiUrl = 'http://truotlobinhdinh.girc.edu.vn/api/forecast-points';
@@ -176,16 +168,24 @@ Future<void> _loadHourlyForecast() async {
     for (var point in _dailyForecastPoints) {
       for (var forecast in point.duBao) {
         double risk = double.tryParse(forecast['nguy_co'].toString()) ?? 0;
-        if (risk >= 5.0) counts[5] = (counts[5] ?? 0) + 1;
-        else if (risk >= 4.0) counts[4] = (counts[4] ?? 0) + 1;
-        else if (risk >= 3.0) counts[3] = (counts[3] ?? 0) + 1;
-        else if (risk >= 2.0) counts[2] = (counts[2] ?? 0) + 1;
-        else if (risk > 0) counts[1] = (counts[1] ?? 0) + 1;
+        if (risk >= 5.0) {
+          counts[5] = (counts[5] ?? 0) + 1;
+        } else if (risk >= 4.0) {
+          counts[4] = (counts[4] ?? 0) + 1;
+        }
+        else if (risk >= 3.0) {
+          counts[3] = (counts[3] ?? 0) + 1;
+        }
+        else if (risk >= 2.0) {
+          counts[2] = (counts[2] ?? 0) + 1;
+        }
+        else if (risk > 0) {
+          counts[1] = (counts[1] ?? 0) + 1;
+        }
       }
     }
 
     setState(() {
-      _riskLevelCounts = counts;
     });
   }
 
@@ -256,7 +256,7 @@ Widget _buildHourlyForecastTable() {
                 buildRiskIcon(_getRiskLevel(point.nguyCoTruotLon)),
               ]);
             }).toList();
-          }).toList(),
+          }),
         ],
       ),
     ),
@@ -321,7 +321,7 @@ Widget _buildHourlyForecastTable() {
                   ...riskIcons,
                 ]);
               }).toList();
-            }).toList(),
+            }),
           ],
         ),
       ),

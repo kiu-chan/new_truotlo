@@ -1,15 +1,10 @@
-// lib/src/page/map/widgets/landslide_info_dialog.dart
-
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/landslide.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
-import 'package:new_truotlo/src/data/forecast/hourly_forecast_point.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
