@@ -1,3 +1,4 @@
+// lib/src/data/manage/landslide_point.dart
 class ManageLandslidePoint {
   final String id;
   final String name;
@@ -5,6 +6,7 @@ class ManageLandslidePoint {
   final double latitude;
   final double longitude;
   final String description;
+  final List<String> imagePaths;
 
   ManageLandslidePoint({
     required this.id,
@@ -13,16 +15,20 @@ class ManageLandslidePoint {
     required this.latitude,
     required this.longitude,
     required this.description,
+    required this.imagePaths,
   });
 
   factory ManageLandslidePoint.fromJson(Map<String, dynamic> json) {
     return ManageLandslidePoint(
-      id: json['id'],
-      name: json['name'],
-      code: json['code'],
-      latitude: json['latitude'].toDouble(),
-      longitude: json['longitude'].toDouble(),
-      description: json['description'],
+      id: json['id'].toString(),
+      name: json['name'] as String,
+      code: json['code'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      description: json['description'] as String,
+      imagePaths: (json['image_paths'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ?? [],
     );
   }
 }
