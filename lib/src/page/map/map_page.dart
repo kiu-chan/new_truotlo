@@ -41,7 +41,7 @@ class _MapPageState extends State<MapPage> {
   bool _showDistricts = true;
   bool _showCommunes = false;
   bool _showLandslidePoints = true;
-  bool _showBorder = true;
+  bool _showBorder = false;
   
   // Location tracking states
   LatLng? _currentLocation;
@@ -186,21 +186,6 @@ class _MapPageState extends State<MapPage> {
   List<Polygon> _buildPolygons() {
     List<Polygon> polygons = [];
     
-    // Thêm polygon ranh giới tỉnh
-    if (_showBorder) {
-      for (var polygon in _borderPolygons) {
-        polygons.add(
-          Polygon(
-            points: polygon,
-            color: Colors.red.withOpacity(0.1),
-            borderColor: Colors.red,
-            borderStrokeWidth: 2.0,
-            isFilled: true,
-          ),
-        );
-      }
-    }
-    
     // Thêm polygon quận/huyện
     if (_showDistricts) {
       for (var district in _districts) {
@@ -232,6 +217,21 @@ class _MapPageState extends State<MapPage> {
             ),
           );
         }
+      }
+    }
+    
+    // Thêm polygon ranh giới tỉnh
+    if (_showBorder) {
+      for (var polygon in _borderPolygons) {
+        polygons.add(
+          Polygon(
+            points: polygon,
+            color: Colors.transparent,
+            borderColor: Colors.red,
+            borderStrokeWidth: 2.0,
+            isFilled: true,
+          ),
+        );
       }
     }
     

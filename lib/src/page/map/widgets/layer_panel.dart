@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_truotlo/src/page/map/widgets/map_legend.dart';
 
 class LayerPanel extends StatelessWidget {
   final bool showLayerPanel;
@@ -44,6 +45,7 @@ class LayerPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -80,9 +82,12 @@ class LayerPanel extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(8),
+            
+            // Layer switches
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildLayerSwitch(
                     'Ranh giới tỉnh',
@@ -113,6 +118,15 @@ class LayerPanel extends StatelessWidget {
                     context,
                   ),
                 ],
+              ),
+            ),
+            
+            const Divider(height: 1),
+            
+            // Legend
+            const Expanded(
+              child: SingleChildScrollView(
+                child: MapLegend(),
               ),
             ),
           ],
