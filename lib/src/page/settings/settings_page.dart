@@ -4,6 +4,7 @@ import 'package:new_truotlo/src/page/settings/information_page.dart';
 import 'package:new_truotlo/src/page/settings/send_request_page.dart';
 import 'package:new_truotlo/src/select_page.dart';
 import 'package:new_truotlo/src/user/auth_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -15,11 +16,20 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   bool _isLoggedIn = false;
   Map<String, String?> _userData = {};
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _appVersion = packageInfo.version;
+    });
   }
 
   Future<void> _loadUserData() async {
@@ -291,7 +301,7 @@ class SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
-                    'App Version: 1.0.0',
+                    'App Version: $_appVersion',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
