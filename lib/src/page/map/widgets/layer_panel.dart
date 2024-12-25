@@ -30,53 +30,60 @@ class LayerPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      duration: const Duration(milliseconds: 200),
-      right: showLayerPanel ? 0 : -250,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      right: showLayerPanel ? 0 : -280,
       top: 0,
       bottom: 0,
-      width: 250,
+      width: 280,
       child: Card(
         margin: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top,
+          top: MediaQuery.of(context).padding.top + 8,
           bottom: 8,
           right: 8,
         ),
-        elevation: 4,
+        elevation: 8,
+        shadowColor: Colors.black26,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 16, 8, 16),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: Colors.blue.shade50,
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
-                    children: [
-                      Icon(Icons.layers, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
-                        'Lớp bản đồ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  Icon(
+                    Icons.layers,
+                    color: Colors.blue.shade700,
+                    size: 24,
                   ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Lớp bản đồ',
+                    style: TextStyle(
+                      color: Colors.blue.shade900,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: Colors.blue.shade700,
+                    ),
                     onPressed: onClose,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
                     tooltip: 'Đóng',
                   ),
                 ],
@@ -85,37 +92,48 @@ class LayerPanel extends StatelessWidget {
             
             // Layer switches
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLayerSwitch(
-                    'Ranh giới tỉnh',
-                    Icons.blur_on,
-                    showBorder,
-                    onBorderChanged,
-                    context,
+                  _buildLayerSection(
+                    'Ranh giới hành chính',
+                    [
+                      _buildLayerSwitch(
+                        'Ranh giới tỉnh',
+                        Icons.blur_on,
+                        showBorder,
+                        onBorderChanged,
+                        context,
+                      ),
+                      _buildLayerSwitch(
+                        'Quận/Huyện',
+                        Icons.location_city,
+                        showDistricts,
+                        onDistrictsChanged,
+                        context,
+                      ),
+                      _buildLayerSwitch(
+                        'Xã/Phường',
+                        Icons.location_on,
+                        showCommunes,
+                        onCommunesChanged,
+                        context,
+                      ),
+                    ],
                   ),
-                  _buildLayerSwitch(
-                    'Quận/Huyện',
-                    Icons.location_city,
-                    showDistricts,
-                    onDistrictsChanged,
-                    context,
-                  ),
-                  _buildLayerSwitch(
-                    'Xã/Phường',
-                    Icons.location_on,
-                    showCommunes,
-                    onCommunesChanged,
-                    context,
-                  ),
-                  _buildLayerSwitch(
+                  const SizedBox(height: 20),
+                  _buildLayerSection(
                     'Điểm trượt lở',
-                    Icons.warning_amber,
-                    showLandslidePoints,
-                    onLandslidePointsChanged,
-                    context,
+                    [
+                      _buildLayerSwitch(
+                        'Hiển thị điểm',
+                        Icons.warning_rounded,
+                        showLandslidePoints,
+                        onLandslidePointsChanged,
+                        context,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -135,6 +153,37 @@ class LayerPanel extends StatelessWidget {
     );
   }
 
+  Widget _buildLayerSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8, bottom: 8),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.blue.shade900,
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.grey.shade100,
+            ),
+          ),
+          child: Column(
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildLayerSwitch(
     String title,
     IconData icon,
@@ -143,18 +192,35 @@ class LayerPanel extends StatelessWidget {
     BuildContext context,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
+        ),
+      ),
       child: ListTile(
         dense: true,
-        leading: Icon(icon, size: 22),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+        leading: Icon(
+          icon,
+          size: 22,
+          color: value ? Colors.blue.shade600 : Colors.grey.shade600,
+        ),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(
+            fontSize: 14,
+            color: value ? Colors.blue.shade700 : Colors.grey.shade700,
+            fontWeight: value ? FontWeight.w500 : FontWeight.normal,
+          ),
         ),
         trailing: Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Theme.of(context).primaryColor,
+          activeColor: Colors.blue.shade600,
+          activeTrackColor: Colors.blue.shade100,
         ),
       ),
     );

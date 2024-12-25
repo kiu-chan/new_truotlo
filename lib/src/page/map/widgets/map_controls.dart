@@ -28,8 +28,9 @@ class MapControls extends StatelessWidget {
       bottom: 16,
       child: Card(
         elevation: 4,
+        shadowColor: Colors.black26,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Container(
           padding: const EdgeInsets.all(8),
@@ -74,7 +75,6 @@ class MapControls extends StatelessWidget {
                 tooltip: 'Về vị trí mặc định',
                 heroTag: 'defaultLocation',
                 onPressed: onDefaultLocationPressed,
-                color: Theme.of(context).primaryColor,
               ),
               const Divider(height: 1),
               _buildControlButton(
@@ -83,7 +83,7 @@ class MapControls extends StatelessWidget {
                 tooltip: 'Vị trí của tôi',
                 heroTag: 'location',
                 onPressed: isTrackingLocation ? null : onLocationPressed,
-                color: isTrackingLocation ? Colors.grey : Theme.of(context).primaryColor,
+                color: isTrackingLocation ? Colors.grey : Colors.blue.shade700,
               ),
             ],
           ),
@@ -108,7 +108,7 @@ class MapControls extends StatelessWidget {
         icon: Icon(
           icon,
           size: 20,
-          color: color ?? Colors.black87,
+          color: color ?? Colors.blue.shade700,
         ),
         tooltip: tooltip,
         onPressed: onPressed,

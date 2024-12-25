@@ -340,7 +340,7 @@ class _MapPageState extends State<MapPage> {
               child: IconButton(
                 icon: Icon(
                   _showLayerPanel ? Icons.format_list_bulleted : Icons.format_list_bulleted_outlined,
-                  color: Colors.black87,
+                  color: Colors.blue.shade700,
                 ),
                 onPressed: () {
                   setState(() {
