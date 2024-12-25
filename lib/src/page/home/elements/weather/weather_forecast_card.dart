@@ -29,17 +29,18 @@ class WeatherForecastCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 8,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF1976D2), Color(0xFF64B5F6)],
+            colors: [Color(0xFF2196F3), Color(0xFF64B5F6)],
+            stops: [0.0, 1.0],
           ),
         ),
         child: Padding(
@@ -53,6 +54,7 @@ class WeatherForecastCard extends StatelessWidget {
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: 16),
@@ -73,22 +75,30 @@ class WeatherForecastCard extends StatelessWidget {
 
   Widget _buildLocationSelectors() {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
       child: Column(
         children: [
           DropdownButtonFormField<WeatherDistrict>(
             value: selectedDistrict,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Quận/Huyện',
-              labelStyle: TextStyle(color: Colors.white),
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              labelStyle: const TextStyle(color: Colors.white),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            dropdownColor: Colors.blue[700],
+            dropdownColor: const Color(0xFF2196F3),
             style: const TextStyle(color: Colors.white),
             items: districts.map((WeatherDistrict district) {
               return DropdownMenuItem<WeatherDistrict>(
@@ -98,16 +108,23 @@ class WeatherForecastCard extends StatelessWidget {
             }).toList(),
             onChanged: onDistrictChanged,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           DropdownButtonFormField<Ward>(
             value: selectedWard,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Phường/Xã',
-              labelStyle: TextStyle(color: Colors.white),
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              labelStyle: const TextStyle(color: Colors.white),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            dropdownColor: Colors.blue[700],
+            dropdownColor: const Color(0xFF2196F3),
             style: const TextStyle(color: Colors.white),
             items: selectedDistrict.wards.map((Ward ward) {
               return DropdownMenuItem<Ward>(
@@ -128,14 +145,18 @@ class WeatherForecastCard extends StatelessWidget {
         children: [
           const Text(
             'Không thể tải dữ liệu thời tiết',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontSize: 16),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
-              foregroundColor: Colors.blue,
+              foregroundColor: const Color(0xFF2196F3),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             icon: const Icon(Icons.refresh),
             label: const Text('Thử lại'),
@@ -158,8 +179,9 @@ class WeatherForecastCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,15 +191,35 @@ class WeatherForecastCard extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 20,
+                  letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(iconPath, width: 64, height: 64),
-                  const SizedBox(width: 16),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      iconPath,
+                      width: 64,
+                      height: 64,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,20 +228,22 @@ class WeatherForecastCard extends StatelessWidget {
                           '${temp.toStringAsFixed(1)}°C',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 32,
+                            fontSize: 36,
                             fontWeight: FontWeight.bold,
+                            height: 1,
                           ),
                         ),
+                        const SizedBox(height: 4),
                         Text(
                           description,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 18,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         _buildWeatherDetail(Icons.water_drop, '$humidity%', 'Độ ẩm'),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         _buildWeatherDetail(
                           Icons.air,
                           '${windSpeed.toStringAsFixed(1)} m/s',
@@ -213,16 +257,17 @@ class WeatherForecastCard extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         const Text(
           'Dự báo 5 ngày tới',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 18,
+            letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -236,11 +281,21 @@ class WeatherForecastCard extends StatelessWidget {
   Widget _buildWeatherDetail(IconData icon, String value, String label) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white, size: 16),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon, color: Colors.white, size: 16),
+        ),
         const SizedBox(width: 8),
         Text(
           '$label: $value',
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
         ),
       ],
     );
@@ -262,9 +317,11 @@ class WeatherForecastCard extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(right: 12),
           padding: const EdgeInsets.all(12),
+          width: 90,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -274,16 +331,29 @@ class WeatherForecastCard extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 8),
-              Image.asset(iconPath, width: 40, height: 40),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Image.asset(
+                  iconPath,
+                  width: 36,
+                  height: 36,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 12),
               Text(
                 '${temp.toStringAsFixed(1)}°',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
