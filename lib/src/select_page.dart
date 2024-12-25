@@ -15,7 +15,7 @@ class SelectPage extends StatefulWidget {
 
 class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMixin {
   bool _isLoggedIn = false;
-  int currentindex = 0;
+  int _currentIndex = 0;
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -48,15 +48,21 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
   }
 
   Future<void> _loadUserData() async {
-    bool loggedIn = await UserPreferences.isLoggedIn();
-    setState(() {
-      _isLoggedIn = loggedIn;
-    });
+    try {
+      bool loggedIn = await UserPreferences.isLoggedIn();
+      if (mounted) {
+        setState(() {
+          _isLoggedIn = loggedIn;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading user data: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = [
+    final List<Widget> pages = [
       const HomePage(),
       const MapPage(),
       if (_isLoggedIn) const ManagePage(),
@@ -64,7 +70,12 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
       const SettingsPage(),
     ];
 
+    if (_currentIndex >= pages.length) {
+      _currentIndex = 0;
+    }
+
     return Scaffold(
+      backgroundColor: Colors.white,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -80,77 +91,61 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
           );
         },
         child: Container(
-          color: Colors.white,
-          key: ValueKey<int>(currentindex),
-          child: pages[currentindex],
+          key: ValueKey<int>(_currentIndex),
+          child: pages[_currentIndex],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              Colors.green.shade50,
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _primaryGreen.withOpacity(0.15),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-              spreadRadius: 5,
-            ),
-          ],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
         ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-          child: BottomNavigationBar(
-            onTap: (int index) {
+        child: BottomNavigationBar(
+          onTap: (int index) {
+            if (index != _currentIndex) {
               setState(() {
-                currentindex = index;
+                _currentIndex = index;
                 _controller.reset();
                 _controller.forward();
               });
-            },
-            elevation: 0,
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.transparent,
-            currentIndex: currentindex,
-            selectedItemColor: _primaryGreen,
-            unselectedItemColor: Colors.grey.shade400,
-            selectedFontSize: 12,
-            unselectedFontSize: 10,
-            selectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-            unselectedLabelStyle: TextStyle(
-              color: Colors.grey.shade400,
-            ),
-            items: [
-              _buildNavItem(Icons.home_outlined, Icons.home_rounded, 'Home'),
-              _buildNavItem(Icons.map_outlined, Icons.map_rounded, 'Map'),
-              if (_isLoggedIn)
-                _buildNavItem(Icons.manage_accounts_outlined, Icons.manage_accounts_rounded, 'Manage'),
-              _buildNavItem(Icons.ssid_chart_outlined, Icons.ssid_chart_rounded, 'Chart'),
-              _buildNavItem(Icons.settings_outlined, Icons.settings_rounded, 'Settings'),
-            ],
+            }
+          },
+          elevation: 8,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          currentIndex: _currentIndex,
+          selectedItemColor: _primaryGreen,
+          unselectedItemColor: Colors.grey.shade400,
+          selectedFontSize: 12,
+          unselectedFontSize: 10,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
+          unselectedLabelStyle: TextStyle(
+            color: Colors.grey.shade400,
+          ),
+          items: [
+            _buildNavItem(Icons.home_outlined, Icons.home_rounded, 'Home'),
+            _buildNavItem(Icons.map_outlined, Icons.map_rounded, 'Map'),
+            if (_isLoggedIn)
+              _buildNavItem(Icons.manage_accounts_outlined, Icons.manage_accounts_rounded, 'Manage'),
+            _buildNavItem(Icons.ssid_chart_outlined, Icons.ssid_chart_rounded, 'Chart'),
+            _buildNavItem(Icons.settings_outlined, Icons.settings_rounded, 'Settings'),
+          ],
         ),
       ),
     );
   }
 
   BottomNavigationBarItem _buildNavItem(IconData icon, IconData activeIcon, String label) {
+    final bool isSelected = _currentIndex == _getItemIndex(label);
+    
     return BottomNavigationBarItem(
       icon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: currentindex == _getItemIndex(label) 
-              ? _lightGreen.withOpacity(0.1) 
-              : Colors.transparent,
+          color: isSelected ? _lightGreen.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
