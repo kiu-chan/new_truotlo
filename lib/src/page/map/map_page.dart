@@ -4,36 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:new_truotlo/src/page/map/utils/map_types.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:new_truotlo/src/page/map/utils/map_markers.dart';
 import 'package:new_truotlo/src/page/map/utils/map_bounds_handler.dart';
 import 'package:new_truotlo/src/page/map/widgets/landslide_info_dialog.dart';
 import 'package:new_truotlo/src/page/map/widgets/layer_panel.dart';
 import 'package:new_truotlo/src/page/map/widgets/map_controls.dart';
+import 'package:new_truotlo/src/page/map/widgets/map_type_button.dart';
 import 'package:new_truotlo/src/data/map/district_data.dart';
 import 'package:new_truotlo/src/data/map/commune.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
 import 'package:new_truotlo/src/database/database.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
-
-enum MapType {
-  street,
-  satellite,
-  terrain
-}
-
-class MapTypeHelper {
-  static String getUrlTemplate(MapType type) {
-    switch (type) {
-      case MapType.street:
-        return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-      case MapType.satellite:
-        return 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}';
-      case MapType.terrain:
-        return 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}';
-    }
-  }
-}
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -345,64 +328,6 @@ class _MapPageState extends State<MapPage> {
             ],
           ),
           
-          // Map type button
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            right: 64,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: PopupMenuButton<MapType>(
-                tooltip: 'Chọn loại bản đồ',
-                initialValue: _currentMapType,
-                onSelected: (MapType type) {
-                  setState(() => _currentMapType = type);
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: MapType.street,
-                    child: Row(
-                      children: [
-                        Icon(Icons.map_outlined),
-                        SizedBox(width: 8),
-                        Text('Đường phố'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: MapType.satellite,
-                    child: Row(
-                      children: [
-                        Icon(Icons.satellite_outlined),
-                        SizedBox(width: 8),
-                        Text('Vệ tinh'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: MapType.terrain,
-                    child: Row(
-                      children: [
-                        Icon(Icons.terrain),
-                        SizedBox(width: 8),
-                        Text('Địa hình'),
-                      ],
-                    ),
-                  ),
-                ],
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.layers,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          
           // Menu button
           Positioned(
             top: MediaQuery.of(context).padding.top + 8,
@@ -414,7 +339,7 @@ class _MapPageState extends State<MapPage> {
               ),
               child: IconButton(
                 icon: Icon(
-                  _showLayerPanel ? Icons.layers : Icons.layers_outlined,
+                  _showLayerPanel ? Icons.format_list_bulleted : Icons.format_list_bulleted_outlined,
                   color: Colors.black87,
                 ),
                 onPressed: () {
@@ -449,6 +374,16 @@ class _MapPageState extends State<MapPage> {
             isTrackingLocation: _isTrackingLocation,
             minZoom: _minZoom,
             maxZoom: _maxZoom,
+          ),
+
+          // Map type button
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: MapTypeButton(
+              currentType: _currentMapType,
+              onMapTypeChanged: (type) => setState(() => _currentMapType = type),
+            ),
           ),
         ],
       ),
