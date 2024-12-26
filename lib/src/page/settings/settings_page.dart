@@ -309,6 +309,17 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    'Designed by GIRC - TUAF',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
               ]),
             ),
