@@ -47,7 +47,6 @@ class Commune {
         processPolygons(json['geometry']),
       );
     } catch (e) {
-      print('Error parsing commune: $e');
       return Commune(0, '', '', '', []);
     }
   }

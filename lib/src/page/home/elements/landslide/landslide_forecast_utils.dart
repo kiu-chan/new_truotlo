@@ -101,31 +101,3 @@ Widget _buildLegendItem(
     ),
   );
 }
-
-Widget _buildDailyLegendItem(
-    BuildContext context, int riskLevel, String level, String description) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style,
-              children: [
-                TextSpan(
-                    text: '$riskLevel ',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(
-                    text: '$level: ',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: description),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}

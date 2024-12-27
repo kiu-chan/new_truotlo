@@ -13,7 +13,7 @@ import 'package:new_truotlo/src/page/chart/elements/chart_utils.dart';
 import 'package:intl/intl.dart';
 
 class ChartPage extends StatefulWidget {
-  const ChartPage({Key? key}) : super(key: key);
+  const ChartPage({super.key});
 
   @override
   ChartPageState createState() => ChartPageState();

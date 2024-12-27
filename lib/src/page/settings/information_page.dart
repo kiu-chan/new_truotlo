@@ -210,7 +210,7 @@ class InformationPageState extends State<InformationPage> with SingleTickerProvi
                   "body": Style(
                     fontSize: FontSize(16.0),
                     fontFamily: 'Roboto',
-                    lineHeight: LineHeight(1.7),
+                    lineHeight: const LineHeight(1.7),
                     color: Colors.grey[800],
                     margin: Margins.zero,
                     padding: HtmlPaddings.zero,

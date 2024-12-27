@@ -6,9 +6,9 @@ class LandslidePointList extends StatelessWidget {
   final List<ManageLandslidePoint> landslidePoints;
 
   const LandslidePointList({
-    Key? key,
+    super.key,
     required this.landslidePoints,
-  }) : super(key: key);
+  });
 
   static const primaryBlue = Color(0xFF2196F3);
   static const lightBlue = Color(0xFFE3F2FD);
@@ -183,9 +183,9 @@ class LandslidePointList extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: primaryBlue,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: Center(
                   child: Text(
@@ -292,7 +292,7 @@ class LandslidePointList extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Đóng',
                       style: TextStyle(
                         color: primaryBlue,

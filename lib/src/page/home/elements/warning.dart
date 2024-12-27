@@ -255,15 +255,15 @@ class DisasterWarningCardState extends State<DisasterWarningCard> {
                 topRight: Radius.circular(8),
               ),
             ),
-            child: Row(
+            child: const Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.warning_rounded,
                   color: Colors.white,
                   size: 24,
                 ),
-                const SizedBox(width: 8),
-                const Text(
+                SizedBox(width: 8),
+                Text(
                   'Cảnh báo trượt nông',
                   style: TextStyle(
                     color: Colors.white,

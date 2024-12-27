@@ -19,7 +19,7 @@ import 'package:new_truotlo/src/database/database.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+  const MapPage({super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();

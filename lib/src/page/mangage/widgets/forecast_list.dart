@@ -10,11 +10,11 @@ class ForecastList extends StatelessWidget {
   final Function(int) onDelete;
 
   const ForecastList({
-    Key? key,
+    super.key,
     required this.forecasts,
     required this.database,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   static const primaryBlue = Color(0xFF2196F3);
   static const lightBlue = Color(0xFFE3F2FD);
@@ -156,17 +156,17 @@ class ForecastList extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: primaryBlue,
-                    borderRadius: const BorderRadius.vertical(
+                    borderRadius: BorderRadius.vertical(
                       top: Radius.circular(16),
                     ),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Chi tiết dự báo',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         color: Colors.white,
@@ -191,26 +191,26 @@ class ForecastList extends StatelessWidget {
                             children: [
                               DetailRow(
                                 label: 'Tên điểm:', 
-                                value: detail?.tenDiem?.isNotEmpty == true 
-                                  ? detail!.tenDiem 
+                                value: detail.tenDiem.isNotEmpty == true 
+                                  ? detail.tenDiem 
                                   : 'Chưa có dữ liệu'
                               ),
                               DetailRow(
                                 label: 'Vị trí:', 
-                                value: detail?.viTri?.isNotEmpty == true 
-                                  ? detail!.viTri 
+                                value: detail.viTri.isNotEmpty == true 
+                                  ? detail.viTri 
                                   : 'Chưa có dữ liệu'
                               ),
                               DetailRow(
                                 label: 'Kinh độ:', 
                                 value: detail?.kinhDo != null 
-                                  ? detail!.kinhDo.toString() 
+                                  ? detail.kinhDo.toString() 
                                   : 'Chưa có dữ liệu'
                               ),
                               DetailRow(
                                 label: 'Vĩ độ:', 
                                 value: detail?.viDo != null 
-                                  ? detail!.viDo.toString() 
+                                  ? detail.viDo.toString() 
                                   : 'Chưa có dữ liệu'
                               ),
                             ],
@@ -228,20 +228,20 @@ class ForecastList extends StatelessWidget {
                             children: [
                               DetailRow(
                                 label: 'Tỉnh:', 
-                                value: detail?.tinh?.isNotEmpty == true 
-                                  ? detail!.tinh 
+                                value: detail.tinh.isNotEmpty == true 
+                                  ? detail.tinh 
                                   : 'Chưa có dữ liệu'
                               ),
                               DetailRow(
                                 label: 'Huyện:', 
-                                value: detail?.huyen?.isNotEmpty == true 
-                                  ? detail!.huyen 
+                                value: detail.huyen.isNotEmpty == true 
+                                  ? detail.huyen 
                                   : 'Chưa có dữ liệu'
                               ),
                               DetailRow(
                                 label: 'Xã:', 
                                 value: detail?.xa?.isNotEmpty == true 
-                                  ? detail!.xa 
+                                  ? detail.xa 
                                   : 'Chưa có dữ liệu'
                               ),
                             ],
@@ -267,7 +267,7 @@ class ForecastList extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              ...(detail?.days?.isEmpty == false ? detail!.days.map((day) => Container(
+                              ...(detail?.days?.isEmpty == false ? detail.days.map((day) => Container(
                                 margin: const EdgeInsets.only(bottom: 8),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,

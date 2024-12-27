@@ -47,15 +47,11 @@ class RainfallDataService {
         url = '$baseUrl/rainfall-data';
       }
 
-      print('Fetching rainfall data from: $url'); // Debug log
-
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final List<dynamic> data = jsonData['data'];
-        
-        print('Received ${data.length} rainfall records'); // Debug log
         
         List<RainfallData> rainfallDataList = data
             .map((item) => RainfallData.fromJson(item))
@@ -72,23 +68,13 @@ class RainfallDataService {
               .where((data) => data.measurementTime.isAfter(twoDaysAgo))
               .toList();
         }
-
-        print('Processed ${rainfallDataList.length} rainfall records'); // Debug log
         
-        // Log dữ liệu mẫu để debug
-        if (rainfallDataList.isNotEmpty) {
-          print('Sample data - First record: ${rainfallDataList.first.measurementTime} - ${rainfallDataList.first.rainfallAmount}');
-          print('Sample data - Last record: ${rainfallDataList.last.measurementTime} - ${rainfallDataList.last.rainfallAmount}');
-        }
 
         return rainfallDataList;
       } else {
-        print('Error response: ${response.statusCode}');
-        print('Response body: ${response.body}');
         throw Exception('Failed to load rainfall data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error in fetchRainfallData: $e');
       rethrow;
     }
   }

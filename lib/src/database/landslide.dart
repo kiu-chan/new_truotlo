@@ -148,7 +148,7 @@ class LandslideDatabase {
 
   Future<Map<String, int>> getForecastCounts(String currentDateTime) async {
     try {
-      final url = '$_baseUrl/forecast-record-points';
+      const url = '$_baseUrl/forecast-record-points';
       final response = await http.get(Uri.parse(url));
       
       if (response.statusCode == 200) {
@@ -190,7 +190,7 @@ class LandslideDatabase {
 
   Future<HourlyForecastResponse> fetchHourlyForecastPoints() async {
     try {
-      final url = '$_baseUrl/forecast-points';
+      const url = '$_baseUrl/forecast-points';
       final response = await http.get(Uri.parse(url));
       
       if (response.statusCode == 200) {

@@ -30,9 +30,7 @@ $content
 
     try {
       final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
     } on MailerException catch (e) {
-      print('Message not sent. \n' + e.toString());
       throw e;
     }
   }

@@ -124,7 +124,7 @@ class ChartMenu extends StatelessWidget {
                       );
                     }).toList(),
                   );
-                }).toList(),
+                }),
                 const Divider(),
                 SwitchListTile(
                   title: const Text('Hiển thị chú thích'),
@@ -134,10 +134,10 @@ class ChartMenu extends StatelessWidget {
                   onChanged: onShowLegendChanged,
                 ),
                 if (!isAdmin)
-                  ListTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: const Text('Chế độ xem hạn chế'),
-                    subtitle: const Text('Chỉ hiển thị dữ liệu 2 ngày gần nhất'),
+                  const ListTile(
+                    leading: Icon(Icons.info_outline),
+                    title: Text('Chế độ xem hạn chế'),
+                    subtitle: Text('Chỉ hiển thị dữ liệu 2 ngày gần nhất'),
                     dense: true,
                   ),
               ],

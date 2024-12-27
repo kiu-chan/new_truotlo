@@ -9,13 +9,13 @@ class DetailRow extends StatelessWidget {
   final TextStyle? valueStyle;
 
   const DetailRow({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     this.showDivider = true,
     this.labelStyle,
     this.valueStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

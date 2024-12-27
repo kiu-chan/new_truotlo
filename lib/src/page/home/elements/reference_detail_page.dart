@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 class ReferenceDetailPage extends StatefulWidget {
   final int id;
 
-  const ReferenceDetailPage({Key? key, required this.id}) : super(key: key);
+  const ReferenceDetailPage({super.key, required this.id});
 
   @override
   _ReferenceDetailPageState createState() => _ReferenceDetailPageState();

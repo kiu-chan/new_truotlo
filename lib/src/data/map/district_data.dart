@@ -33,7 +33,6 @@ class District {
         processPolygons(json['geometry']),
       );
     } catch (e) {
-      print('Error parsing district: $e');
       return District(0, '', []);
     }
   }

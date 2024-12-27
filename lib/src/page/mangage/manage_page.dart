@@ -149,7 +149,7 @@ class ManagePageState extends State<ManagePage> with SingleTickerProviderStateMi
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 48,
               color: primaryBlue,
@@ -185,7 +185,7 @@ class ManagePageState extends State<ManagePage> with SingleTickerProviderStateMi
       body: Column(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -220,7 +220,7 @@ class ManagePageState extends State<ManagePage> with SingleTickerProviderStateMi
           ),
           Expanded(
             child: isLoading
-                ? Center(
+                ? const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -232,7 +232,7 @@ class ManagePageState extends State<ManagePage> with SingleTickerProviderStateMi
                             valueColor: AlwaysStoppedAnimation<Color>(primaryBlue),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Text(
                           'Đang tải dữ liệu...',
                           style: TextStyle(
