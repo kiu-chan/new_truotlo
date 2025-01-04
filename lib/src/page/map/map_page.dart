@@ -12,6 +12,7 @@ import 'package:new_truotlo/src/page/map/widgets/landslide_info_dialog.dart';
 import 'package:new_truotlo/src/page/map/widgets/layer_panel.dart';
 import 'package:new_truotlo/src/page/map/widgets/map_controls.dart';
 import 'package:new_truotlo/src/page/map/widgets/map_type_button.dart';
+import 'package:new_truotlo/src/page/map/widgets/district_labels.dart';
 import 'package:new_truotlo/src/data/map/district_data.dart';
 import 'package:new_truotlo/src/data/map/commune.dart';
 import 'package:new_truotlo/src/data/map/landslide_point.dart';
@@ -325,10 +326,13 @@ class _MapPageState extends State<MapPage> {
               MarkerLayer(
                 markers: _buildMarkers(),
               ),
+              DistrictLabels(
+                districts: _districts,
+                showLabels: _showDistricts,
+              ),
             ],
           ),
           
-          // Menu button
           Positioned(
             top: MediaQuery.of(context).padding.top + 8,
             right: 8,
@@ -352,7 +356,6 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           
-          // Layer panel
           LayerPanel(
             showLayerPanel: _showLayerPanel,
             showDistricts: _showDistricts,
@@ -366,7 +369,6 @@ class _MapPageState extends State<MapPage> {
             onClose: () => setState(() => _showLayerPanel = false),
           ),
           
-          // Map controls
           MapControls(
             mapController: _mapController,
             onDefaultLocationPressed: _moveToDefaultLocation,
@@ -376,7 +378,6 @@ class _MapPageState extends State<MapPage> {
             maxZoom: _maxZoom,
           ),
 
-          // Map type button
           Positioned(
             bottom: 16,
             right: 16,
