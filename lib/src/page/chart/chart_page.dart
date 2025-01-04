@@ -41,7 +41,6 @@ class ChartPageState extends State<ChartPage> {
   final Map<int, bool> _lineVisibility = {};
   
   // User states
-  String? _userRole;
   bool _isAdmin = false;
 
   @override
@@ -56,7 +55,6 @@ class ChartPageState extends State<ChartPage> {
       final isLoggedIn = await UserPreferences.isLoggedIn();
       if (mounted) {
         setState(() {
-          _userRole = role;
           _isAdmin = isLoggedIn && role == 'admin';
         });
         await _fetchData(showLoadingIndicator: true);

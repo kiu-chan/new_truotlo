@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:new_truotlo/src/config/chart.dart';
 import 'package:new_truotlo/src/data/chart/landslide_data.dart';
 import 'package:new_truotlo/src/data/forecast/hourly_forecast_response.dart';
 import 'package:new_truotlo/src/user/auth_service.dart';

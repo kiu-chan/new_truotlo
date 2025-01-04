@@ -29,9 +29,9 @@ $content
 ''';
 
     try {
-      final sendReport = await send(message, smtpServer);
-    } on MailerException catch (e) {
-      throw e;
+      await send(message, smtpServer);
+    } on MailerException {
+      rethrow;
     }
   }
 }

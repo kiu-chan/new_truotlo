@@ -17,7 +17,6 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
   bool _isLoggedIn = false;
   int _currentIndex = 0;
   late AnimationController _controller;
-  late Animation<double> _animation;
 
   // Định nghĩa màu chủ đạo
   final Color _primaryGreen = const Color(0xFF4CAF50);
@@ -33,10 +32,6 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
       vsync: this,
     );
     
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOutCubic,
-    );
     
     _controller.forward();
   }

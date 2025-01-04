@@ -203,13 +203,13 @@ class ForecastList extends StatelessWidget {
                               ),
                               DetailRow(
                                 label: 'Kinh độ:', 
-                                value: detail?.kinhDo != null 
+                                value: detail.kinhDo != null 
                                   ? detail.kinhDo.toString() 
                                   : 'Chưa có dữ liệu'
                               ),
                               DetailRow(
                                 label: 'Vĩ độ:', 
-                                value: detail?.viDo != null 
+                                value: detail.viDo != null 
                                   ? detail.viDo.toString() 
                                   : 'Chưa có dữ liệu'
                               ),
@@ -240,7 +240,7 @@ class ForecastList extends StatelessWidget {
                               ),
                               DetailRow(
                                 label: 'Xã:', 
-                                value: detail?.xa?.isNotEmpty == true 
+                                value: detail.xa.isNotEmpty == true 
                                   ? detail.xa 
                                   : 'Chưa có dữ liệu'
                               ),
@@ -267,7 +267,7 @@ class ForecastList extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              ...(detail?.days?.isEmpty == false ? detail.days.map((day) => Container(
+                              ...(detail.days.isEmpty == false ? detail.days.map((day) => Container(
                                 margin: const EdgeInsets.only(bottom: 8),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
