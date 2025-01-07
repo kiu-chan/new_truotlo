@@ -441,7 +441,7 @@ class ChartPageState extends State<ChartPage> {
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 200,
-child: SingleChildScrollView(
+                child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: ChartUtils.buildLegendItems(

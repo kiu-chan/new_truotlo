@@ -349,7 +349,18 @@ class _ReferenceDetailPageState extends State<ReferenceDetailPage> {
                             ),
                           ),
                         ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: Text(
+                          'Designed by GIRC - TUAF',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),

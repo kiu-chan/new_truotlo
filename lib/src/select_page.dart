@@ -121,12 +121,12 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
             color: Colors.grey.shade400,
           ),
           items: [
-            _buildNavItem(Icons.home_outlined, Icons.home_rounded, 'Home'),
-            _buildNavItem(Icons.map_outlined, Icons.map_rounded, 'Map'),
+            _buildNavItem(Icons.home_outlined, Icons.home_rounded, 'Trang chủ'),
+            _buildNavItem(Icons.map_outlined, Icons.map_rounded, 'Bản đồ'),
             if (_isLoggedIn)
-              _buildNavItem(Icons.manage_accounts_outlined, Icons.manage_accounts_rounded, 'Manage'),
-            _buildNavItem(Icons.ssid_chart_outlined, Icons.ssid_chart_rounded, 'Chart'),
-            _buildNavItem(Icons.settings_outlined, Icons.settings_rounded, 'Settings'),
+              _buildNavItem(Icons.manage_accounts_outlined, Icons.manage_accounts_rounded, 'Quản lý'),
+            _buildNavItem(Icons.ssid_chart_outlined, Icons.ssid_chart_rounded, 'Biểu đồ'),
+            _buildNavItem(Icons.settings_outlined, Icons.settings_rounded, 'Cài đặt'),
           ],
         ),
       ),
@@ -166,15 +166,15 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
 
   int _getItemIndex(String label) {
     switch (label) {
-      case 'Home':
+      case 'Trang chủ':
         return 0;
-      case 'Map':
+      case 'Bản đồ':
         return 1;
-      case 'Manage':
+      case 'Quản lý':
         return 2;
-      case 'Chart':
+      case 'Biểu đồ':
         return _isLoggedIn ? 3 : 2;
-      case 'Settings':
+      case 'Cài đặt':
         return _isLoggedIn ? 4 : 3;
       default:
         return 0;

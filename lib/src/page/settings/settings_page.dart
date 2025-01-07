@@ -91,7 +91,7 @@ class SettingsPageState extends State<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _isLoggedIn ? (_userData['name'] ?? 'N/A') : 'Welcome, Guest',
+                        _isLoggedIn ? (_userData['name'] ?? 'N/A') : 'Trượt lở Bình Định',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         Text(
-                          'Role: ${_userData['role'] ?? 'N/A'}',
+                          'Vai trò: ${_userData['role'] ?? 'N/A'}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.white70,
@@ -116,7 +116,7 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                       ] else
                         const Text(
-                          'Login to access all features',
+                          'Đăng nhập để sử dụng đầy đủ tính năng',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white70,
@@ -216,7 +216,7 @@ class SettingsPageState extends State<SettingsPage> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
                 child: Text(
-                  'Settings',
+                  'Cài đặt',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -229,8 +229,8 @@ class SettingsPageState extends State<SettingsPage> {
               delegate: SliverChildListDelegate([
                 _buildSettingsItem(
                   icon: Icons.send_rounded,
-                  title: 'Send Request',
-                  subtitle: 'Submit a new request or inquiry',
+                  title: 'Gửi yêu cầu',
+                  subtitle: 'Gửi yêu cầu hỗ trợ hoặc phản hồi',
                   iconColor: Colors.green,
                   onTap: () {
                     Navigator.push(
@@ -243,8 +243,8 @@ class SettingsPageState extends State<SettingsPage> {
                 ),
                 _buildSettingsItem(
                   icon: Icons.info_rounded,
-                  title: 'Information',
-                  subtitle: 'About us and app details',
+                  title: 'Thông tin ứng dụng',
+                  subtitle: 'Xem thông tin ứng dụng và nhóm phát triển',
                   iconColor: Colors.orange,
                   onTap: () {
                     Navigator.push(
@@ -257,17 +257,17 @@ class SettingsPageState extends State<SettingsPage> {
                 ),
                 _buildSettingsItem(
                   icon: _isLoggedIn ? Icons.logout_rounded : Icons.login_rounded,
-                  title: _isLoggedIn ? 'Logout' : 'Login',
+                  title: _isLoggedIn ? 'Đăng xuất' : 'Đăng nhập',
                   subtitle: _isLoggedIn
-                      ? 'Sign out of your account'
-                      : 'Sign in to your account',
+                      ? 'Đăng xuất khỏi tài khoản của bạn'
+                      : 'Đăng nhập để sử dụng đầy đủ tính năng',
                   iconColor: _isLoggedIn ? Colors.red : Colors.blue,
                   onTap: _isLoggedIn
                       ? () async {
                           await _logout();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Logged out successfully'),
+                              content: Text('Đăng xuất thành công'),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
@@ -290,7 +290,7 @@ class SettingsPageState extends State<SettingsPage> {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Logged in successfully'),
+                                  content: Text('Đăng nhập thành công'),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );

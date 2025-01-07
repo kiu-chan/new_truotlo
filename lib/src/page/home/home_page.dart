@@ -272,7 +272,7 @@ class HomePageState extends State<HomePage> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: const Text(
-          'Home',
+          'Trang chủ',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
@@ -331,6 +331,17 @@ class HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 16),
               _buildReferencesList(),
+              const SizedBox(height: 24),
+              Center(
+                child: Text(
+                  'Designed by GIRC - TUAF',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
