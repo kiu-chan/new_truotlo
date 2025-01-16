@@ -27,6 +27,7 @@ class LandslideForecastCardState extends State<LandslideForecastCard> {
   void initState() {
     super.initState();
     _loadForecastData();
+    _lastUpdateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
     // Thiết lập timer để tự động cập nhật dữ liệu mỗi giờ
     _setupPeriodicUpdate();
   }
@@ -39,6 +40,7 @@ class LandslideForecastCardState extends State<LandslideForecastCard> {
 
     // Đặt timer để cập nhật vào đầu giờ tiếp theo
     Future.delayed(duration, () {
+      _updateCurrentTime();
       _loadForecastData();
       // Sau đó thiết lập cập nhật định kỳ mỗi giờ
       Stream.periodic(const Duration(hours: 1)).listen((_) {
@@ -47,6 +49,14 @@ class LandslideForecastCardState extends State<LandslideForecastCard> {
         }
       });
     });
+  }
+
+  void _updateCurrentTime() {
+    if (mounted) {
+      setState(() {
+        _lastUpdateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+      });
+    }
   }
 
   String _formatDateTime(String dateTime) {
@@ -411,7 +421,7 @@ Widget _buildHourlyForecastTable() {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'DỰ BÁO LÚC: ${_showHourlyForecast ? _currentHourKey : _formatDateTime(_lastUpdateTime)}',
+                          'DỰ BÁO LÚC: ${_formatDateTime(_lastUpdateTime)}',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

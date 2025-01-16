@@ -272,7 +272,7 @@ class HomePageState extends State<HomePage> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: const Text(
-          'Trang chủ',
+          'Tin tức',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,

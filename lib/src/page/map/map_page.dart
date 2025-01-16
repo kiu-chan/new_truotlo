@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:new_truotlo/src/page/map/utils/map_types.dart';
+import 'package:new_truotlo/src/page/map/widgets/map_loading.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:new_truotlo/src/page/map/utils/map_markers.dart';
 import 'package:new_truotlo/src/page/map/utils/map_bounds_handler.dart';
@@ -270,18 +271,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Đang tải dữ liệu bản đồ...'),
-            ],
-          ),
-        ),
-      );
+      return const LoadingScreen();
     }
 
     return Scaffold(

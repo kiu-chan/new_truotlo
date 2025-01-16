@@ -150,15 +150,15 @@ class ChartPageState extends State<ChartPage> {
       });
 
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Đã cập nhật dữ liệu: ${rainfallData.length} bản ghi lượng mưa',
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text(
+      //       'Đã cập nhật dữ liệu: ${rainfallData.length} bản ghi lượng mưa',
+      //     ),
+      //     backgroundColor: Colors.green,
+      //     duration: const Duration(seconds: 2),
+      //   ),
+      // );
     } catch (e) {
       print('Error fetching data: $e');
       _handleError('Lỗi khi tải dữ liệu: $e');

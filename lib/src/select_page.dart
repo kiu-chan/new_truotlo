@@ -58,8 +58,8 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
-      const HomePage(),
       const MapPage(),
+      const HomePage(),
       if (_isLoggedIn) const ManagePage(),
       const ChartPage(),
       const SettingsPage(),
@@ -121,8 +121,8 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
             color: Colors.grey.shade400,
           ),
           items: [
-            _buildNavItem(Icons.home_outlined, Icons.home_rounded, 'Trang chủ'),
             _buildNavItem(Icons.map_outlined, Icons.map_rounded, 'Bản đồ'),
+            _buildNavItem(Icons.assignment_outlined, Icons.assignment_rounded, 'Tin tức'),
             if (_isLoggedIn)
               _buildNavItem(Icons.manage_accounts_outlined, Icons.manage_accounts_rounded, 'Quản lý'),
             _buildNavItem(Icons.ssid_chart_outlined, Icons.ssid_chart_rounded, 'Biểu đồ'),
@@ -166,9 +166,9 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
 
   int _getItemIndex(String label) {
     switch (label) {
-      case 'Trang chủ':
-        return 0;
       case 'Bản đồ':
+        return 0;
+      case 'Tin tức':
         return 1;
       case 'Quản lý':
         return 2;

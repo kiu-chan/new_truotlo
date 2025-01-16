@@ -268,10 +268,12 @@ class WeatherForecastCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: _buildForecastDays(),
+        Center(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: _buildForecastDays(),
+            ),
           ),
         ),
       ],
