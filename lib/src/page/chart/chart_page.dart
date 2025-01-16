@@ -7,6 +7,7 @@ import 'package:new_truotlo/src/data/chart/landslide_data.dart';
 import 'package:new_truotlo/src/data/chart/rainfall_data.dart';
 import 'package:new_truotlo/src/database/landslide.dart';
 import 'package:new_truotlo/src/page/chart/elements/chart_menu.dart';
+import 'package:new_truotlo/src/page/map/widgets/map_loading.dart';
 import 'package:new_truotlo/src/user/auth_service.dart';
 import 'package:new_truotlo/src/page/chart/elements/chart_data_processor.dart';
 import 'package:new_truotlo/src/page/chart/elements/chart_utils.dart';
@@ -298,14 +299,7 @@ class ChartPageState extends State<ChartPage> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Đang tải dữ liệu...'),
-          ],
-        ),
+        child: LoadingScreen(),
       );
     }
 
