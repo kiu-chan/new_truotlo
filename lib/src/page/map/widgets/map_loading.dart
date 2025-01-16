@@ -83,7 +83,7 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
                       child: Column(
                         children: [
                           const Text(
-                            'Đang tải dữ liệu bản đồ',
+                            'Đang tải dữ liệu...',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
