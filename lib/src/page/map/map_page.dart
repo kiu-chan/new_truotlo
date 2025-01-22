@@ -412,6 +412,15 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: MapTypeButton(
+              currentType: _currentMapType,
+              onMapTypeChanged: (type) =>
+                  setState(() => _currentMapType = type),
+            ),
+          ),
           LayerPanel(
             showLayerPanel: _showLayerPanel,
             showDistricts: _showDistricts,
@@ -433,15 +442,6 @@ class _MapPageState extends State<MapPage> {
             isTrackingLocation: _isTrackingLocation,
             minZoom: _minZoom,
             maxZoom: _maxZoom,
-          ),
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: MapTypeButton(
-              currentType: _currentMapType,
-              onMapTypeChanged: (type) =>
-                  setState(() => _currentMapType = type),
-            ),
           ),
         ],
       ),
