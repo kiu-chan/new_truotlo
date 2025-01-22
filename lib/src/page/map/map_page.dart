@@ -31,14 +31,14 @@ class _MapPageState extends State<MapPage> {
   // Controllers
   final DefaultDatabase _database = DefaultDatabase();
   final MapController _mapController = MapController();
-  
+
   // Data states
   List<District> _districts = [];
   List<Commune> _communes = [];
   List<LandslidePoint> _landslidePoints = [];
   List<List<LatLng>> _borderPolygons = [];
   HourlyForecastResponse? _forecastResponse;
-  
+
   // UI states
   bool _isLoading = true;
   bool _showLayerPanel = false;
@@ -47,7 +47,7 @@ class _MapPageState extends State<MapPage> {
   bool _showLandslidePoints = true;
   bool _showBorder = false;
   MapType _currentMapType = MapType.street;
-  
+
   // Location tracking states
   LatLng? _currentLocation;
   bool _isTrackingLocation = false;
@@ -65,8 +65,8 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     _mapBounds = LatLngBounds(
-      const LatLng(13.5, 108.5),  // South West
-      const LatLng(14.5, 109.5),  // North East
+      const LatLng(13.5, 108.5), // South West
+      const LatLng(14.5, 109.5), // North East
     );
     _loadData();
     _checkLocationPermission();
@@ -84,7 +84,7 @@ class _MapPageState extends State<MapPage> {
       setState(() => _isLoading = true);
 
       await _database.connect();
-      
+
       final futures = await Future.wait([
         _database.fetchDistrictsData(),
         _database.fetchCommunesData(),
@@ -92,16 +92,16 @@ class _MapPageState extends State<MapPage> {
         _database.fetchAndParseGeometry(),
         _database.fetchHourlyForecastPoints(),
       ]);
-      
+
       setState(() {
         _districts = futures[0] as List<District>;
         _communes = futures[1] as List<Commune>;
         _landslidePoints = futures[2] as List<LandslidePoint>;
         _borderPolygons = futures[3] as List<List<LatLng>>;
         _forecastResponse = futures[4] as HourlyForecastResponse;
-        
+
         _mapBounds = MapBoundsHandler.calculateBounds(_borderPolygons);
-        
+
         _isLoading = false;
       });
     } catch (e) {
@@ -109,8 +109,8 @@ class _MapPageState extends State<MapPage> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Có lỗi khi tải dữ liệu: ${e.toString()}'),
+          const SnackBar(
+            content: Text('Có lỗi khi tải dữ liệu vui lòng thử lại sau'),
             backgroundColor: Colors.red,
           ),
         );
@@ -127,22 +127,66 @@ class _MapPageState extends State<MapPage> {
         if (mounted) {
           final result = await showDialog<bool>(
             context: context,
+            barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: const Text('Yêu cầu quyền truy cập'),
-              content: const Text('Ứng dụng cần quyền truy cập vị trí để hiển thị vị trí của bạn.'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              icon: const Icon(
+                Icons.location_on_outlined,
+                size: 48,
+                color: Colors.blue,
+              ),
+              title: const Text(
+                'Yêu cầu quyền truy cập',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Text(
+                'Ứng dụng cần quyền truy cập vị trí để hiển thị vị trí của bạn.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              buttonPadding: const EdgeInsets.symmetric(horizontal: 8),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Hủy'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
-                TextButton(
+                ElevatedButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Đồng ý'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Đồng ý',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ],
             ),
           );
-          
+
           if (result != true) return;
           await Permission.location.request();
         }
@@ -154,9 +198,10 @@ class _MapPageState extends State<MapPage> {
       );
 
       final newLocation = LatLng(position.latitude, position.longitude);
-      
+
       setState(() {
-        _currentLocation = MapBoundsHandler.enforceCenter(newLocation, _mapBounds);
+        _currentLocation =
+            MapBoundsHandler.enforceCenter(newLocation, _mapBounds);
       });
 
       _mapController.move(_currentLocation!, 15.0);
@@ -164,8 +209,28 @@ class _MapPageState extends State<MapPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Không thể lấy vị trí: ${e.toString()}'),
+            content: const Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.white,
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Không thể lấy vị trí hiện tại',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            margin: const EdgeInsets.all(8),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -181,7 +246,7 @@ class _MapPageState extends State<MapPage> {
 
   List<Polygon> _buildPolygons() {
     List<Polygon> polygons = [];
-    
+
     if (_showDistricts) {
       for (var district in _districts) {
         for (var polygon in district.polygons) {
@@ -197,7 +262,7 @@ class _MapPageState extends State<MapPage> {
         }
       }
     }
-    
+
     if (_showCommunes) {
       for (var commune in _communes) {
         for (var polygon in commune.polygons) {
@@ -213,7 +278,7 @@ class _MapPageState extends State<MapPage> {
         }
       }
     }
-    
+
     if (_showBorder) {
       for (var polygon in _borderPolygons) {
         polygons.add(
@@ -227,13 +292,13 @@ class _MapPageState extends State<MapPage> {
         );
       }
     }
-    
+
     return polygons;
   }
 
   List<Marker> _buildMarkers() {
     final List<Marker> markers = [];
-    
+
     if (_showLandslidePoints) {
       markers.addAll(MapMarkersHandler.buildMarkers(
         points: _landslidePoints,
@@ -295,7 +360,8 @@ class _MapPageState extends State<MapPage> {
                     _mapBounds,
                   );
                   if (newCenter != position.center) {
-                    _mapController.move(newCenter, position.zoom ?? _initialZoom);
+                    _mapController.move(
+                        newCenter, position.zoom ?? _initialZoom);
                   }
                 }
               },
@@ -322,7 +388,6 @@ class _MapPageState extends State<MapPage> {
               ),
             ],
           ),
-          
           Positioned(
             top: MediaQuery.of(context).padding.top + 8,
             right: 8,
@@ -333,7 +398,9 @@ class _MapPageState extends State<MapPage> {
               ),
               child: IconButton(
                 icon: Icon(
-                  _showLayerPanel ? Icons.format_list_bulleted : Icons.format_list_bulleted_outlined,
+                  _showLayerPanel
+                      ? Icons.format_list_bulleted
+                      : Icons.format_list_bulleted_outlined,
                   color: Colors.blue.shade700,
                 ),
                 onPressed: () {
@@ -345,20 +412,20 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
-          
           LayerPanel(
             showLayerPanel: _showLayerPanel,
             showDistricts: _showDistricts,
             showCommunes: _showCommunes,
             showLandslidePoints: _showLandslidePoints,
             showBorder: _showBorder,
-            onDistrictsChanged: (value) => setState(() => _showDistricts = value),
+            onDistrictsChanged: (value) =>
+                setState(() => _showDistricts = value),
             onCommunesChanged: (value) => setState(() => _showCommunes = value),
-            onLandslidePointsChanged: (value) => setState(() => _showLandslidePoints = value),
+            onLandslidePointsChanged: (value) =>
+                setState(() => _showLandslidePoints = value),
             onBorderChanged: (value) => setState(() => _showBorder = value),
             onClose: () => setState(() => _showLayerPanel = false),
           ),
-          
           MapControls(
             mapController: _mapController,
             onDefaultLocationPressed: _moveToDefaultLocation,
@@ -367,13 +434,13 @@ class _MapPageState extends State<MapPage> {
             minZoom: _minZoom,
             maxZoom: _maxZoom,
           ),
-
           Positioned(
             bottom: 16,
             right: 16,
             child: MapTypeButton(
               currentType: _currentMapType,
-              onMapTypeChanged: (type) => setState(() => _currentMapType = type),
+              onMapTypeChanged: (type) =>
+                  setState(() => _currentMapType = type),
             ),
           ),
         ],

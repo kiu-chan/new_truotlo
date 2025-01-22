@@ -116,7 +116,7 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                       ] else
                         const Text(
-                          'Đăng nhập để sử dụng đầy đủ tính năng',
+                          'Ứng dụng dự báo thông tin trượt lở',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white70,

@@ -162,7 +162,7 @@ class ChartPageState extends State<ChartPage> {
       // );
     } catch (e) {
       print('Error fetching data: $e');
-      _handleError('Lỗi khi tải dữ liệu: $e');
+      _handleError('Lỗi khi tải dữ liệu vui lòng thử lại sau');
     }
   }
 
