@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:new_truotlo/src/config/map.dart';
 import 'package:new_truotlo/src/page/map/utils/map_types.dart';
 import 'package:new_truotlo/src/page/map/widgets/map_loading.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -40,34 +41,31 @@ class _MapPageState extends State<MapPage> {
   HourlyForecastResponse? _forecastResponse;
 
   // UI states
-  bool _isLoading = true;
-  bool _showLayerPanel = false;
-  bool _showDistricts = true;
-  bool _showCommunes = false;
-  bool _showLandslidePoints = true;
-  bool _showBorder = false;
-  MapType _currentMapType = MapType.street;
+  bool _isLoading = MapConfig.isLoading;
+  bool _showLayerPanel = MapConfig.showLayerPanel;
+  bool _showDistricts = MapConfig.showDistricts;
+  bool _showCommunes = MapConfig.showCommunes;
+  bool _showLandslidePoints = MapConfig.showLandslidePoints;
+  bool _showBorder = MapConfig.showBorder;
+  MapType _currentMapType = MapConfig.currentMapType;
 
   // Location tracking states
   LatLng? _currentLocation;
-  bool _isTrackingLocation = false;
+  bool _isTrackingLocation = MapConfig.isTrackingLocation;
 
   // Map bounds state
   late LatLngBounds _mapBounds;
 
   // Map constants
-  static const LatLng _binhDinhCenter = LatLng(14.1766, 109.1746);
-  static const double _initialZoom = 9.0;
-  static const double _minZoom = 8.0;
-  static const double _maxZoom = 18.0;
+  static const LatLng _binhDinhCenter = MapConfig.binhDinhCenter;
+  static const double _initialZoom = MapConfig.initialZoom;
+  static const double _minZoom = MapConfig.minZoom;
+  static const double _maxZoom = MapConfig.maxZoom;
 
   @override
   void initState() {
     super.initState();
-    _mapBounds = LatLngBounds(
-      const LatLng(13.5, 108.5), // South West
-      const LatLng(14.5, 109.5), // North East
-    );
+    _mapBounds = MapConfig.mapBounds;
     _loadData();
     _checkLocationPermission();
   }
