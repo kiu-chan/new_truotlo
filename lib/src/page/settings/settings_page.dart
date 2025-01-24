@@ -73,7 +73,7 @@ class SettingsPageState extends State<SettingsPage> {
                     border: Border.all(color: Colors.white, width: 3),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withAlpha((0.1 * 255).round()),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -91,7 +91,9 @@ class SettingsPageState extends State<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _isLoggedIn ? (_userData['name'] ?? 'N/A') : 'Trượt lở Bình Định',
+                        _isLoggedIn
+                            ? (_userData['name'] ?? 'N/A')
+                            : 'Trượt lở Bình Định',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -147,7 +149,7 @@ class SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -158,7 +160,7 @@ class SettingsPageState extends State<SettingsPage> {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: (iconColor ?? Colors.blue).withOpacity(0.1),
+            color: (iconColor ?? Colors.blue).withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: iconColor ?? Colors.blue, size: 26),
@@ -256,7 +258,8 @@ class SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 _buildSettingsItem(
-                  icon: _isLoggedIn ? Icons.logout_rounded : Icons.login_rounded,
+                  icon:
+                      _isLoggedIn ? Icons.logout_rounded : Icons.login_rounded,
                   title: _isLoggedIn ? 'Đăng xuất' : 'Đăng nhập',
                   subtitle: _isLoggedIn
                       ? 'Đăng xuất khỏi tài khoản của bạn'
@@ -264,14 +267,19 @@ class SettingsPageState extends State<SettingsPage> {
                   iconColor: _isLoggedIn ? Colors.red : Colors.blue,
                   onTap: _isLoggedIn
                       ? () async {
+                          final navigatorContext = context;
                           await _logout();
+                          if (!context.mounted) return;
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Đăng xuất thành công'),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
-                          await Navigator.of(context).pushAndRemoveUntil(
+                          if (!navigatorContext.mounted) return;
+
+                          Navigator.of(navigatorContext).pushAndRemoveUntil(
                             MaterialPageRoute(
                               builder: (context) => const SelectPage(),
                             ),
@@ -279,22 +287,24 @@ class SettingsPageState extends State<SettingsPage> {
                           );
                         }
                       : () async {
-                          final result = await Navigator.push(
+                          final result = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const LoginPage(),
                             ),
                           );
+
+                          if (!mounted) return;
                           if (result == true) {
                             await _loadUserData();
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Đăng nhập thành công'),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
-                            }
+                            if (!context.mounted) return;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Đăng nhập thành công'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
                           }
                         },
                 ),

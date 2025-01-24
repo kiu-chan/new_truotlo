@@ -61,7 +61,7 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withAlpha((0.1 * 255).round()),
                       blurRadius: 10,
                       spreadRadius: 2,
                     ),

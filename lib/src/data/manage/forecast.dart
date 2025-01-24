@@ -58,8 +58,8 @@ class Forecast {
 class ForecastDetail {
   final String tenDiem;
   final String viTri;
-  final double kinhDo;
-  final double viDo;
+  final double? kinhDo;
+  final double? viDo;
   final String tinh;
   final String huyen;
   final String xa;

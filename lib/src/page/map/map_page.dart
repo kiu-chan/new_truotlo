@@ -194,7 +194,9 @@ class _MapPageState extends State<MapPage> {
       }
 
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       final newLocation = LatLng(position.latitude, position.longitude);
@@ -253,7 +255,7 @@ class _MapPageState extends State<MapPage> {
           polygons.add(
             Polygon(
               points: polygon,
-              color: Colors.blue.withOpacity(0.2),
+              color: Colors.blue.withAlpha((0.2 * 255).round()),
               borderColor: Colors.blue,
               borderStrokeWidth: 2.0,
               isFilled: true,
@@ -269,7 +271,7 @@ class _MapPageState extends State<MapPage> {
           polygons.add(
             Polygon(
               points: polygon,
-              color: Colors.green.withOpacity(0.2),
+              color: Colors.green.withAlpha((0.2 * 255).round()),
               borderColor: Colors.green,
               borderStrokeWidth: 1.0,
               isFilled: true,
@@ -316,7 +318,7 @@ class _MapPageState extends State<MapPage> {
           height: 30,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.7),
+              color: Colors.blue.withAlpha((0.7 * 255).round()),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
             ),
@@ -349,9 +351,9 @@ class _MapPageState extends State<MapPage> {
               initialZoom: _initialZoom,
               minZoom: _minZoom,
               maxZoom: _maxZoom,
-              bounds: _mapBounds,
-              boundsOptions: const FitBoundsOptions(
-                padding: EdgeInsets.all(20),
+              initialCameraFit: CameraFit.bounds(
+                bounds: _mapBounds,
+                padding: const EdgeInsets.all(20),
               ),
               onPositionChanged: (MapPosition position, bool hasGesture) {
                 if (hasGesture && position.center != null) {

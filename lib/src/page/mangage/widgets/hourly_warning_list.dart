@@ -58,10 +58,10 @@ class HourlyWarningList extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withAlpha((0.1 * 255).round()),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: color.withOpacity(0.5),
+            color: color.withAlpha((0.5 * 255).round()),
             width: 1,
           ),
         ),
@@ -101,10 +101,10 @@ class HourlyWarningList extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: color.withOpacity(0.5),
+          color: color.withAlpha((0.5 * 255).round()),
           width: 1,
         ),
       ),
@@ -167,7 +167,7 @@ class HourlyWarningList extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withAlpha((0.1 * 255).round()),
               width: 1,
             ),
           ),
@@ -256,19 +256,19 @@ class HourlyWarningList extends StatelessWidget {
                       children: [
                         _buildListRiskIndicator(
                           'TN',
-                          warning.nguy_co_truot_nong,
+                          warning.truotNong,
                           'Trượt nông'
                         ),
                         const SizedBox(width: 8),
                         _buildListRiskIndicator(
                           'LQ',
-                          warning.nguy_co_lu_quet,
+                          warning.luQuet,
                           'Lũ quét'
                         ),
                         const SizedBox(width: 8),
                         _buildListRiskIndicator(
                           'TL',
-                          warning.nguy_co_truot_lon,
+                          warning.truotLon,
                           'Trượt lớn'
                         ),
                       ],
@@ -333,17 +333,17 @@ class HourlyWarningList extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildDetailRiskIndicator(
                         'Nguy cơ trượt nông',
-                        warning.nguy_co_truot_nong,
+                        warning.truotNong,
                       ),
                       const SizedBox(height: 8),
                       _buildDetailRiskIndicator(
                         'Nguy cơ lũ quét',
-                        warning.nguy_co_lu_quet,
+                        warning.luQuet,
                       ),
                       const SizedBox(height: 8),
                       _buildDetailRiskIndicator(
                         'Nguy cơ trượt lớn',
-                        warning.nguy_co_truot_lon,
+                        warning.truotLon,
                       ),
                       const SizedBox(height: 16),
                       DetailRow(

@@ -5,9 +5,9 @@ class HourlyWarning {
   final int month;
   final int year;
   final String location;
-  final String nguy_co_truot_nong;
-  final String nguy_co_lu_quet;
-  final String nguy_co_truot_lon;
+  final String truotNong;
+  final String luQuet;
+  final String truotLon;
   final String description;
   final double lat;
   final double lon;
@@ -19,9 +19,9 @@ class HourlyWarning {
     required this.month,
     required this.year,
     required this.location,
-    required this.nguy_co_truot_nong,
-    required this.nguy_co_lu_quet,
-    required this.nguy_co_truot_lon,
+    required this.truotNong,
+    required this.luQuet,
+    required this.truotLon,
     required this.description,
     required this.lat,
     required this.lon,
@@ -37,9 +37,9 @@ class HourlyWarning {
       month: json['month'],
       year: json['year'],
       location: json['location'],
-      nguy_co_truot_nong: json['nguy_co_truot_nong'],
-      nguy_co_lu_quet: json['nguy_co_lu_quet'],
-      nguy_co_truot_lon: json['nguy_co_truot_lon'],
+      truotNong: json['nguy_co_truot_nong'],
+      luQuet: json['nguy_co_lu_quet'],
+      truotLon: json['nguy_co_truot_lon'],
       description: json['description'],
       lat: double.parse(json['lat']),
       lon: double.parse(json['lon']),

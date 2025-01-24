@@ -77,9 +77,9 @@ class WeatherForecastCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withAlpha((0.15 * 255).round()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
       ),
       child: Column(
         children: [
@@ -90,11 +90,11 @@ class WeatherForecastCard extends StatelessWidget {
               labelStyle: const TextStyle(color: Colors.white),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                borderSide: BorderSide(color: Colors.white.withAlpha((0.3 * 255).round())),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                borderSide: BorderSide(color: Colors.white.withAlpha((0.3 * 255).round())),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
@@ -116,11 +116,11 @@ class WeatherForecastCard extends StatelessWidget {
               labelStyle: const TextStyle(color: Colors.white),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                borderSide: BorderSide(color: Colors.white.withAlpha((0.3 * 255).round())),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                borderSide: BorderSide(color: Colors.white.withAlpha((0.3 * 255).round())),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
@@ -179,9 +179,9 @@ class WeatherForecastCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withAlpha((0.15 * 255).round()),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +206,7 @@ class WeatherForecastCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withAlpha((0.1 * 255).round()),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -237,7 +237,7 @@ class WeatherForecastCard extends StatelessWidget {
                         Text(
                           description,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withAlpha((0.9 * 255).round()),
                             fontSize: 18,
                           ),
                         ),
@@ -286,7 +286,7 @@ class WeatherForecastCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withAlpha((0.2 * 255).round()),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(icon, color: Colors.white, size: 16),
@@ -321,9 +321,9 @@ class WeatherForecastCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           width: 90,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withAlpha((0.15 * 255).round()),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -101,7 +101,7 @@ class LoginPageState extends State<LoginPage> {
                           color: Colors.white,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withAlpha((0.1 * 255).round()),
                               spreadRadius: 2,
                               blurRadius: 10,
                               offset: const Offset(0, 3),
@@ -141,7 +141,7 @@ class LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withAlpha((0.05 * 255).round()),
                             spreadRadius: 2,
                             blurRadius: 10,
                             offset: const Offset(0, 3),

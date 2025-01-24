@@ -101,6 +101,7 @@ class HomePageState extends State<HomePage> {
   Future<void> _onReferenceClicked(int id) async {
     try {
       await homeDatabase.incrementViews(id);
+      if (!mounted) return;
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -146,7 +147,7 @@ class HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha((0.1 * 255).round()),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),

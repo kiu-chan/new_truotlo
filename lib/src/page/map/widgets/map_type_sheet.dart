@@ -123,7 +123,7 @@ class MapTypeSheet extends StatelessWidget {
                 ),
                 boxShadow: isSelected ? [
                   BoxShadow(
-                    color: Colors.blue.shade100.withOpacity(0.5),
+                    color: Colors.blue.shade100.withAlpha((0.5 * 255).round()),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

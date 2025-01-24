@@ -16,7 +16,8 @@ class RiskLevel {
   RiskLevel(this.color, this.level, this.value);
 }
 
-Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) async {
+Future<void> showLandslideInfoDialog(
+    BuildContext context, int landslideId) async {
   try {
     // Hiển thị loading indicator
     showDialog(
@@ -37,6 +38,7 @@ Future<void> showLandslideInfoDialog(BuildContext context, int landslideId) asyn
     final detail = responses[0] as Map<String, dynamic>;
     final forecastResponse = responses[1] as HourlyForecastResponse;
 
+    if (!context.mounted) return;
     Navigator.of(context).pop(); // Đóng loading indicator
 
     // Xử lý danh sách hình ảnh
@@ -217,7 +219,7 @@ Widget _buildWarningRow(String label, RiskLevel risk) {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: risk.color.withOpacity(0.1),
+            color: risk.color.withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(4),
             border: Border.all(color: risk.color),
           ),
@@ -247,7 +249,8 @@ Widget _buildWarningRow(String label, RiskLevel risk) {
   );
 }
 
-Widget _buildDirectionsButton(BuildContext context, Map<String, dynamic> detail) {
+Widget _buildDirectionsButton(
+    BuildContext context, Map<String, dynamic> detail) {
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -315,7 +318,8 @@ Widget _buildImageSection(BuildContext context, List<String> images) {
   );
 }
 
-Widget _buildImageItem(BuildContext context, String imageUrl, VoidCallback onTap) {
+Widget _buildImageItem(
+    BuildContext context, String imageUrl, VoidCallback onTap) {
   return Padding(
     padding: const EdgeInsets.only(right: 8),
     child: GestureDetector(
@@ -353,7 +357,8 @@ Widget _buildImageItem(BuildContext context, String imageUrl, VoidCallback onTap
   );
 }
 
-void _showFullScreenImage(BuildContext context, List<String> images, int initialIndex) {
+void _showFullScreenImage(
+    BuildContext context, List<String> images, int initialIndex) {
   Navigator.push(
     context,
     MaterialPageRoute(
@@ -410,7 +415,8 @@ void _showFullScreenImage(BuildContext context, List<String> images, int initial
   );
 }
 
-Future<void> _openGoogleMaps(BuildContext context, Map<String, dynamic> detail) async {
+Future<void> _openGoogleMaps(
+    BuildContext context, Map<String, dynamic> detail) async {
   try {
     // Kiểm tra quyền truy cập vị trí
     final permission = await Permission.location.status;
@@ -420,7 +426,8 @@ Future<void> _openGoogleMaps(BuildContext context, Map<String, dynamic> detail) 
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Yêu cầu quyền truy cập'),
-            content: const Text('Ứng dụng cần quyền truy cập vị trí để tìm đường đi.'),
+            content: const Text(
+                'Ứng dụng cần quyền truy cập vị trí để tìm đường đi.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -442,7 +449,9 @@ Future<void> _openGoogleMaps(BuildContext context, Map<String, dynamic> detail) 
     Position? currentPosition;
     try {
       currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
     } catch (e) {
       print('Error getting current location: $e');

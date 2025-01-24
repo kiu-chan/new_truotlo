@@ -52,7 +52,7 @@ class ForecastList extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withAlpha((0.1 * 255).round()),
               width: 1,
             ),
           ),
@@ -140,7 +140,8 @@ class ForecastList extends StatelessWidget {
 
   void _showForecastDetails(BuildContext context, int forecastId) async {
     try {
-      final detail = await database.landslideDatabase.fetchForecastDetail(forecastId);
+      final detail =
+          await database.landslideDatabase.fetchForecastDetail(forecastId);
 
       if (!context.mounted) return;
 
@@ -190,29 +191,25 @@ class ForecastList extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               DetailRow(
-                                label: 'Tên điểm:', 
-                                value: detail.tenDiem.isNotEmpty == true 
-                                  ? detail.tenDiem 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Tên điểm:',
+                                  value: detail.tenDiem.isNotEmpty == true
+                                      ? detail.tenDiem
+                                      : 'Chưa có dữ liệu'),
                               DetailRow(
-                                label: 'Vị trí:', 
-                                value: detail.viTri.isNotEmpty == true 
-                                  ? detail.viTri 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Vị trí:',
+                                  value: detail.viTri.isNotEmpty == true
+                                      ? detail.viTri
+                                      : 'Chưa có dữ liệu'),
                               DetailRow(
-                                label: 'Kinh độ:', 
-                                value: detail.kinhDo != null 
-                                  ? detail.kinhDo.toString() 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Kinh độ:',
+                                  value: detail.kinhDo != null
+                                      ? detail.kinhDo.toString()
+                                      : 'Chưa có dữ liệu'),
                               DetailRow(
-                                label: 'Vĩ độ:', 
-                                value: detail.viDo != null 
-                                  ? detail.viDo.toString() 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Vĩ độ:',
+                                  value: detail.viDo != null
+                                      ? detail.viDo.toString()
+                                      : 'Chưa có dữ liệu'),
                             ],
                           ),
                         ),
@@ -227,23 +224,20 @@ class ForecastList extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               DetailRow(
-                                label: 'Tỉnh:', 
-                                value: detail.tinh.isNotEmpty == true 
-                                  ? detail.tinh 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Tỉnh:',
+                                  value: detail.tinh.isNotEmpty == true
+                                      ? detail.tinh
+                                      : 'Chưa có dữ liệu'),
                               DetailRow(
-                                label: 'Huyện:', 
-                                value: detail.huyen.isNotEmpty == true 
-                                  ? detail.huyen 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Huyện:',
+                                  value: detail.huyen.isNotEmpty == true
+                                      ? detail.huyen
+                                      : 'Chưa có dữ liệu'),
                               DetailRow(
-                                label: 'Xã:', 
-                                value: detail.xa.isNotEmpty == true 
-                                  ? detail.xa 
-                                  : 'Chưa có dữ liệu'
-                              ),
+                                  label: 'Xã:',
+                                  value: detail.xa.isNotEmpty == true
+                                      ? detail.xa
+                                      : 'Chưa có dữ liệu'),
                             ],
                           ),
                         ),
@@ -267,89 +261,102 @@ class ForecastList extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              ...(detail.days.isEmpty == false ? detail.days.map((day) => Container(
-                                margin: const EdgeInsets.only(bottom: 8),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: Colors.blue.withOpacity(0.3),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today,
-                                      size: 16,
-                                      color: primaryBlue.withOpacity(0.7),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        'Ngày ${day.day} (${day.date.day}/${day.date.month}/${day.date.year})',
-                                        style: const TextStyle(
-                                          fontSize: 13,
+                              ...(detail.days.isEmpty == false
+                                  ? detail.days.map((day) => Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: Colors.blue
+                                                .withAlpha((0.3 * 255).round()),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.calendar_today,
+                                              size: 16,
+                                              color: primaryBlue.withAlpha(
+                                                  (0.7 * 255).round()),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                'Ngày ${day.day} (${day.date.day}/${day.date.month}/${day.date.year})',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: primaryBlue.withAlpha(
+                                                    (0.1 * 255).round()),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                'Nguy cơ: ${day.riskLevel}',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: primaryBlue,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                  : [
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: Colors.blue
+                                                .withAlpha((0.3 * 255).round()),
+                                          ),
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.info_outline,
+                                              size: 16,
+                                              color: Colors.grey,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Chưa có dữ liệu dự báo',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: primaryBlue.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        'Nguy cơ: ${day.riskLevel}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: primaryBlue,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )) : [
-                                Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color: Colors.blue.withOpacity(0.3),
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.info_outline,
-                                        size: 16,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Chưa có dữ liệu dự báo',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ]),
+                                    ]),
                             ],
                           ),
                         ),
@@ -369,7 +376,7 @@ class ForecastList extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Đóng',
                         style: TextStyle(
                           color: primaryBlue,
@@ -401,84 +408,5 @@ class ForecastList extends StatelessWidget {
         ),
       );
     }
-  }
-
-  void _showNoDataDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: primaryBlue,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Chi tiết dự báo',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 48,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Chưa có dữ liệu chi tiết',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Đóng',
-                          style: TextStyle(
-                            color: primaryBlue,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 }

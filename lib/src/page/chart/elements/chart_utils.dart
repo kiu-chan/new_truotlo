@@ -312,7 +312,7 @@ class ChartUtils {
           ),
           belowBarData: BarAreaData(
             show: true,
-            color: (isCumulative ? Colors.green : Colors.blue).withOpacity(0.15),
+            color: (isCumulative ? Colors.green : Colors.blue).withAlpha((0.15 * 255).round()),
           ),
         ),
       );

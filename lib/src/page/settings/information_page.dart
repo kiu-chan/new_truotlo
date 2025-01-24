@@ -94,7 +94,7 @@ class InformationPageState extends State<InformationPage> with SingleTickerProvi
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withAlpha((0.2 * 255).round()),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -143,7 +143,7 @@ class InformationPageState extends State<InformationPage> with SingleTickerProvi
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withAlpha((0.1 * 255).round()),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
@@ -193,7 +193,7 @@ class InformationPageState extends State<InformationPage> with SingleTickerProvi
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withAlpha((0.06 * 255).round()),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),

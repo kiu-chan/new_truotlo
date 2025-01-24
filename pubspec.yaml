@@ -2,7 +2,7 @@ name: new_truotlo
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.2+14
+version: 1.2.3+15
 
 environment:
   sdk: ^3.5.0

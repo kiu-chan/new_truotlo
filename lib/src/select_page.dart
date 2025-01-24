@@ -140,7 +140,7 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
       icon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isSelected ? _lightGreen.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? _lightGreen.withAlpha((0.1 * 255).round()) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
@@ -151,7 +151,7 @@ class SelectPageState extends State<SelectPage> with SingleTickerProviderStateMi
       activeIcon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: _lightGreen.withOpacity(0.2),
+          color: _lightGreen.withAlpha((0.2 * 255).round()),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(

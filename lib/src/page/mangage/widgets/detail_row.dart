@@ -57,7 +57,7 @@ class DetailRow extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 0.5,
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withAlpha((0.2 * 255).round()),
           ),
       ],
     );

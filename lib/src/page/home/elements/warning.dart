@@ -194,7 +194,7 @@ class DisasterWarningCardState extends State<DisasterWarningCard> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: riskColor.withOpacity(0.1),
+                          color: riskColor.withAlpha((0.1 * 255).round()),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -235,7 +235,7 @@ class DisasterWarningCardState extends State<DisasterWarningCard> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha((0.1 * 255).round()),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),

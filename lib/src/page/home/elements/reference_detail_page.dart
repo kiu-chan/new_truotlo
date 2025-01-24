@@ -10,10 +10,10 @@ class ReferenceDetailPage extends StatefulWidget {
   const ReferenceDetailPage({super.key, required this.id});
 
   @override
-  _ReferenceDetailPageState createState() => _ReferenceDetailPageState();
+  ReferenceDetailPageState createState() => ReferenceDetailPageState();
 }
 
-class _ReferenceDetailPageState extends State<ReferenceDetailPage> {
+class ReferenceDetailPageState extends State<ReferenceDetailPage> {
   final HomeDatabase homeDatabase = HomeDatabase();
   final ApiConfig apiConfig = ApiConfig();
   Map<String, dynamic> referenceDetails = {};
@@ -112,7 +112,7 @@ class _ReferenceDetailPageState extends State<ReferenceDetailPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -138,7 +138,7 @@ class _ReferenceDetailPageState extends State<ReferenceDetailPage> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withAlpha((0.7 * 255).round()),
                     ],
                   ),
                 ),
@@ -262,7 +262,7 @@ class _ReferenceDetailPageState extends State<ReferenceDetailPage> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withAlpha((0.05 * 255).round()),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),
@@ -273,7 +273,7 @@ class _ReferenceDetailPageState extends State<ReferenceDetailPage> {
                             style: {
                               "body": Style(
                                 fontSize: FontSize(16.0),
-                                lineHeight: LineHeight(1.6),
+                                lineHeight: const LineHeight(1.6),
                                 textAlign: TextAlign.justify,
                                 margin: Margins.zero,
                                 padding: HtmlPaddings.zero,

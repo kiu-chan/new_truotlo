@@ -28,7 +28,7 @@ class MapUtils {
           polygons.add(
             Polygon(
               points: polygon,
-              color: Colors.blue.withOpacity(0.2),
+              color: Colors.blue.withAlpha((0.2 * 255).round()),
               borderColor: Colors.blue,
               borderStrokeWidth: 2.0,
               isFilled: true,
@@ -46,7 +46,7 @@ class MapUtils {
           polygons.add(
             Polygon(
               points: polygon,
-              color: Colors.green.withOpacity(0.2),
+              color: Colors.green.withAlpha((0.2 * 255).round()),
               borderColor: Colors.green,
               borderStrokeWidth: 1.0,
               isFilled: true,
